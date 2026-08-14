@@ -22,11 +22,16 @@ actor LoopbackNode {
     /// When set, the node answers inv announcements of transactions with a
     /// getdata after this delay (nil = never request, the silent peer).
     let autoRequestDelay: Duration?
+    /// The node's mempool: transactions it serves over getdata (MSG_TX /
+    /// MSG_WITNESS_TX) — unknown tx hashes get a notfound.
+    let transactions: [Data: Transaction] // keyed by txid (internal order)
 
     private var listener: NWListener?
     private var connection: NWConnection?
     private var framer: MessageFramer
     private(set) var port: UInt16 = 0
+    /// The BIP37 relay flag from the client's version handshake.
+    private(set) var clientRelay: Bool?
 
     /// All decoded post-handshake messages received from the client.
     private var inbox: [PeerMessage] = []
@@ -38,12 +43,13 @@ actor LoopbackNode {
 
     init(params: NetworkParams, services: UInt64 = PeerConnection.nodeCompactFilters,
          chain: [Block] = [], corruptFilterAtHeight: Int? = nil,
-         autoRequestDelay: Duration? = nil) {
+         autoRequestDelay: Duration? = nil, transactions: [Transaction] = []) {
         self.params = params
         self.services = services
         self.chain = chain
         self.corruptFilterAtHeight = corruptFilterAtHeight
         self.autoRequestDelay = autoRequestDelay
+        self.transactions = Dictionary(uniqueKeysWithValues: transactions.map { ($0.txid, $0) })
         framer = MessageFramer(magic: params.magic)
     }
 
@@ -147,7 +153,8 @@ actor LoopbackNode {
                 framer.append(chunk)
                 while let (command, payload) = try framer.nextMessage() {
                     let message = try PeerMessage.decode(command: command, payload: payload)
-                    if case .version = message {
+                    if case let .version(version) = message {
+                        clientRelay = version.relay
                         try await send(.verack)
                         continue
                     }
@@ -255,10 +262,20 @@ actor LoopbackNode {
             }
 
         case let .getdata(payload):
+            var notFound: [InventoryVector] = []
             for vector in payload.vectors {
                 if vector.type.baseType == .block, let height = height(ofHash: vector.hash) {
                     try await send(.block(chain[height]))
+                } else if vector.type.baseType == .tx {
+                    if let transaction = transactions[vector.hash] {
+                        try await send(.tx(transaction))
+                    } else {
+                        notFound.append(vector)
+                    }
                 }
+            }
+            if !notFound.isEmpty {
+                try await send(.notfound(InventoryPayload(notFound)))
             }
 
         default:

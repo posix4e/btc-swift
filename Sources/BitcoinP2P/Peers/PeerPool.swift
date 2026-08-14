@@ -9,6 +9,10 @@ public actor PeerPool {
     public let params: NetworkParams
     public let peerCount: Int
     public let manualPeers: [PeerEndpoint]
+    /// BIP37 relay flag for connections this pool creates: true asks peers to
+    /// inv every relayed transaction (bounded mempool windows, §2.8, fetch
+    /// them with getdata; without a window open the invs are simply dropped).
+    public let relayPreference: Bool
     /// JSON file where known-good peers are persisted.
     private let peersFileURL: URL?
 
@@ -18,11 +22,13 @@ public actor PeerPool {
     private var started = false
 
     public init(params: NetworkParams, peerCount: Int = 3,
-                manualPeers: [PeerEndpoint] = [], peersFileURL: URL? = nil) {
+                manualPeers: [PeerEndpoint] = [], peersFileURL: URL? = nil,
+                relayPreference: Bool = false) {
         self.params = params
         self.peerCount = peerCount
         self.manualPeers = manualPeers
         self.peersFileURL = peersFileURL
+        self.relayPreference = relayPreference
         if let peersFileURL,
            let data = try? Data(contentsOf: peersFileURL),
            let stored = try? JSONDecoder().decode([PeerEndpoint].self, from: data) {
@@ -82,7 +88,8 @@ public actor PeerPool {
         guard needed > 0 else { return }
         let connected = Set(peers.map(\.endpoint))
         for endpoint in candidates(excluding: connected) where needed > 0 {
-            let peer = PeerConnection(endpoint: endpoint, params: params)
+            let peer = PeerConnection(endpoint: endpoint, params: params,
+                                      relayPreference: relayPreference)
             do {
                 try await peer.connect()
                 peers.append(peer)

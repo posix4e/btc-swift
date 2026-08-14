@@ -29,7 +29,10 @@ struct HomeView: View {
                 }
 
                 Section("Sync") {
-                    LabeledContent("Filter scan", value: "block \(model.status.nextScanHeight) of \(model.status.tipHeight)")
+                    // nextScanHeight is the NEXT block to scan, so a fully
+                    // scanned tip reads "tip+1 of tip" — clamp the display.
+                    LabeledContent("Filter scan",
+                                   value: "block \(min(model.status.nextScanHeight, model.status.tipHeight)) of \(model.status.tipHeight)")
                     LabeledContent("Peers", value: "\(model.status.peerCount)")
                     if model.status.syncing {
                         ProgressView("Scanning filters…")

@@ -21,6 +21,8 @@ struct SendView: View {
     @State private var sending = false
     @State private var sentTxid: Data?
     @State private var relayLog: [String] = []
+    @State private var relayedPeers: Set<String> = []
+    @State private var feeFloorNotice = false
     @State private var confirmedHeight: UInt32?
     @FocusState private var amountFocused: Bool
 
@@ -116,6 +118,18 @@ struct SendView: View {
                         Text(sentTxid.displayHex)
                             .font(.system(.caption2, design: .monospaced))
                             .textSelection(.enabled)
+                        if !relayedPeers.isEmpty {
+                            Text("Relayed to \(relayedPeers.count) peer(s)")
+                                .font(.footnote)
+                                .accessibilityIdentifier("relayedCount")
+                        }
+                        if feeFloorNotice {
+                            Label("The network relay floor is now above this fee — it may not propagate; consider a higher fee.",
+                                  systemImage: "exclamationmark.triangle")
+                                .font(.footnote)
+                                .foregroundStyle(.orange)
+                                .accessibilityIdentifier("feeFloorNotice")
+                        }
                         ForEach(Array(relayLog.enumerated()), id: \.offset) { _, line in
                             Text(line).font(.footnote)
                         }
@@ -191,25 +205,57 @@ struct SendView: View {
         preview = nil
         sentTxid = nil
         relayLog = []
+        relayedPeers = []
+        feeFloorNotice = false
         confirmedHeight = nil
         error = nil
     }
 
-    /// Follows the broadcaster's events for the sent transaction: announced →
-    /// relayed (a peer asked for the tx) → confirmed (filter match).
+    /// Follows the broadcast: TxBroadcaster events (announced → a peer asked
+    /// for the tx) plus mempool-window echoes (§2.8 — a peer inv'ing our txid
+    /// back proves the network has it), until the filter match confirms it.
+    /// The window is bounded by this send-status view.
     private func watchBroadcastEvents() async {
         guard let sentTxid, let broadcaster = model.stack?.broadcaster else { return }
+        let window = model.makeMempoolWindow(watchScripts: [])
+        if let window {
+            await window.watchEcho(of: sentTxid)
+            await window.start()
+        }
+        let echoTask = window.map { window in
+            Task {
+                for await event in await window.events() {
+                    guard case let .txidEchoed(txid, peer) = event, txid == sentTxid else { continue }
+                    relayedPeers.insert(peer.description)
+                }
+            }
+        }
         for await event in await broadcaster.events() {
             switch event {
             case let .announced(txid, peerCount) where txid == sentTxid:
                 relayLog.append("Announced to \(peerCount) peer(s)")
             case let .requested(txid, peer) where txid == sentTxid:
-                relayLog.append("Relayed to \(peer)")
+                if relayedPeers.insert(peer.description).inserted {
+                    relayLog.append("Relayed to \(peer)")
+                }
+            case let .feeFloorExceeded(txid, _) where txid == sentTxid:
+                feeFloorNotice = true
             case let .confirmed(txid) where txid == sentTxid:
-                confirmedHeight = model.status.history.first { $0.txid == txid }?.height
+                // The history snapshot here can still hold the pending
+                // (height 0) entry — the post-sync refresh lands the real
+                // height, and the onChange below then fills it in.
+                if let height = model.status.history.first(where: { $0.txid == txid })?.height,
+                   height > 0 {
+                    confirmedHeight = height
+                }
+                // Propagation tracking ends at confirmation.
+                echoTask?.cancel()
+                if let window { Task { await window.stop() } }
             default:
                 break
             }
         }
+        echoTask?.cancel()
+        await window?.stop()
     }
 }

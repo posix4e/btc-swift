@@ -67,6 +67,14 @@ final class AppModel {
         let broadcaster: TxBroadcaster
     }
 
+    /// Opens a bounded mempool window (docs/read-side.md §2.8) on the pool.
+    /// The caller owns the lifecycle: `start()` when the screen appears,
+    /// `stop()` when it disappears or the app backgrounds. nil without a stack.
+    func makeMempoolWindow(watchScripts: Set<Data>) -> MempoolWindow? {
+        guard let stack else { return nil }
+        return MempoolWindow(pool: stack.pool, watchScripts: watchScripts)
+    }
+
     private(set) var stage: Stage = .loading
     private(set) var status = Status()
     private(set) var vaults: [VaultRecord] = []
@@ -167,8 +175,13 @@ final class AppModel {
         guard stack == nil, let dir = storageDirectory() else { return }
         do {
             let params = e2e?.networkParams ?? NetworkParams.params(for: network)
+            // relayPreference: peers inv us relayed transactions so bounded
+            // mempool windows (§2.8) can open on live connections without a
+            // reconnect. With no window open the invs are dropped unanswered —
+            // the window bounds the expensive part (getdata of every tx).
             let pool = PeerPool(params: params, manualPeers: parsedManualPeers(),
-                                peersFileURL: dir.appending(path: "peers.json"))
+                                peersFileURL: dir.appending(path: "peers.json"),
+                                relayPreference: true)
             let chain = try HeaderChain(params: params, storageURL: dir.appending(path: "headers.bin"))
             let broadcaster = TxBroadcaster(pool: pool, storageURL: dir.appending(path: "broadcast.json"))
             var newStack = SyncStack(pool: pool, chain: chain, filters: nil, broadcaster: broadcaster)
@@ -298,7 +311,9 @@ final class AppModel {
         guard let filters = stack?.filters else { return nil }
         await stack?.pool.start()
         guard (try? await waitForPeer(timeout: .seconds(60))) != nil else { return nil }
-        let report = try? await wallet.verifyImport(bundle, using: filters)
+        // A verification failure (e.g. a peer serving a bad filter) is a real
+        // error for the user, not the "no peers yet" soft path.
+        let report = try await wallet.verifyImport(bundle, using: filters)
         await refresh()
         return report
     }
@@ -422,7 +437,8 @@ final class AppModel {
         let prepared = try await wallet.buildSend(payments: preview.payments,
                                                   feeRateSatPerVByte: preview.feeRateSatPerVByte,
                                                   silentPayments: preview.silentPayments)
-        let txid = try await broadcast(prepared.built.transaction)
+        let txid = try await broadcast(prepared.built.transaction,
+                                       feeRateSatPerVByte: preview.feeRateSatPerVByte)
         try await wallet.commit(prepared)
         await refresh()
         return txid
@@ -430,10 +446,12 @@ final class AppModel {
 
     /// Broadcasts a fully-signed transaction via P2P relay — and additionally
     /// POSTs it to the esplora backend when the user opted in.
-    func broadcast(_ transaction: BitcoinTransaction) async throws -> Data {
+    /// `feeRateSatPerVByte` (known from the send preview) enables the
+    /// broadcaster's BIP133 fee-floor events.
+    func broadcast(_ transaction: BitcoinTransaction, feeRateSatPerVByte: Double? = nil) async throws -> Data {
         guard let broadcaster = stack?.broadcaster else { throw AppError.noStack }
         let raw = transaction.serialized(includeWitness: true)
-        let txid = try await broadcaster.broadcast(raw)
+        let txid = try await broadcaster.broadcast(raw, feeRateSatPerVByte: feeRateSatPerVByte)
         if esploraEnabled {
             _ = try? await EsploraClient(baseURL: esploraBaseURL).broadcast(raw)
         }

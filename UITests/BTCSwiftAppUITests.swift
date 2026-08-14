@@ -127,10 +127,12 @@ final class BTCSwiftAppUITests: XCTestCase {
         let app = launchApp(reset: true, expectOnboarding: true)
         Screenshots.capture(app, "01-onboarding", testCase: self)
 
+        let createStart = Date()
         app.buttons["createWalletButton"].tap()
         // Creation syncs headers from the local node first.
         let toggle = app.switches["writtenDownToggle"]
         XCTAssertTrue(toggle.waitForExistence(timeout: 180), "backup sheet did not appear")
+        Timings.record("onboarding", step: "wallet-create", from: createStart)
         Screenshots.capture(app, "02-backup-mnemonic", testCase: self)
 
         // iOS 26: the toggle is a container switch element wrapping the real
@@ -152,9 +154,11 @@ final class BTCSwiftAppUITests: XCTestCase {
             print("E2E debug: writtenDownToggle value = \(toggle.value ?? "nil")")
             print(app.debugDescription)
         }
+        let backupStart = Date()
         done.tap()
         XCTAssertTrue(app.staticTexts["balanceText"].waitForExistence(timeout: 60),
                       "wallet home did not appear after backup")
+        Timings.record("onboarding", step: "backup→home", from: backupStart)
     }
 
     // MARK: - 02 Receive + funding
@@ -162,9 +166,11 @@ final class BTCSwiftAppUITests: XCTestCase {
     func test02ReceiveAndFunding() async throws {
         let app = launchApp()
 
+        let receiveStart = Date()
         app.buttons["receiveButton"].tap()
         let addressElement = app.staticTexts["receiveAddress"]
         XCTAssertTrue(addressElement.waitForExistence(timeout: 30), "no receive address")
+        Timings.record("receive", step: "address-shown", from: receiveStart)
         Screenshots.capture(app, "03-receive", testCase: self)
         guard let address = addressElement.value as? String, address.hasPrefix("tb1") else {
             XCTFail("could not read the receive address from the UI")
@@ -186,6 +192,7 @@ final class BTCSwiftAppUITests: XCTestCase {
         // first coinbase is spendable by the time the send test runs.
         let script = try AddressDecoder.scriptPubKey(for: address, network: .signet)
         let startHeight = try BitcoinCLI.blockCount()
+        let mineStart = Date()
         let firstHash = try await SignetMiner.mineBlock(payingTo: script)
         let fundingTxid = try BitcoinCLI.coinbaseTxid(blockHash: firstHash)
         let output = try BitcoinCLI.outputZero(txid: fundingTxid)
@@ -195,13 +202,16 @@ final class BTCSwiftAppUITests: XCTestCase {
         for _ in 0 ..< 100 {
             try await SignetMiner.mineBlock(payingTo: script)
         }
+        Timings.record("funding", step: "mine-101-blocks", from: mineStart)
 
         // Filters see blocks, not the mempool: poll (nudging "Sync now")
         // until the confirmed balance shows.
+        let detectStart = Date()
         poll(timeout: 300, interval: 5, "confirmed balance after funding") {
             self.nudgeSync(app)
             return self.balanceText(app) != "0 sats" && self.balanceText(app) != ""
         }
+        Timings.record("funding", step: "mined→detected-by-filters", from: detectStart)
         // A history entry must be there too.
         XCTAssertTrue(app.staticTexts["Received"].waitForExistence(timeout: 60),
                       "no history entry after funding")
@@ -247,18 +257,23 @@ final class BTCSwiftAppUITests: XCTestCase {
         Screenshots.capture(app, "06-send-review", testCase: self)
 
         let mempoolBefore = Set(try BitcoinCLI.mempoolTxids())
+        let broadcastStart = Date()
         app.buttons["sendButton"].tap()
         XCTAssertTrue(poll(timeout: 60, "broadcast status") {
             app.staticTexts["broadcastPending"].exists || app.staticTexts["broadcastConfirmed"].exists
         })
+        Timings.record("send", step: "form→broadcast", from: broadcastStart)
         Screenshots.capture(app, "07-send-broadcast", testCase: self)
 
         // Wait until the node actually has the tx (inv → getdata relay takes
         // a moment after the UI reports the broadcast), THEN mine.
+        let relayStart = Date()
         poll(timeout: 60, interval: 1, "tx relayed into the node's mempool") {
             ((try? Set(BitcoinCLI.mempoolTxids()).isSubset(of: mempoolBefore)) ?? true) == false
         }
+        Timings.record("send", step: "broadcast→echo/relay", from: relayStart)
         let payout = try AddressDecoder.scriptPubKey(for: Self.fixtureAddress(0xD4), network: .signet)
+        let confirmStart = Date()
         try await SignetMiner.mineBlock(payingTo: payout)
 
         // The "Seen in block N" label is a lazily-materialized row below the
@@ -269,6 +284,7 @@ final class BTCSwiftAppUITests: XCTestCase {
             app.tabBars.buttons["Send"].tap()
             return self.scrollUntilExists(app, app.staticTexts["broadcastConfirmed"], maxSwipes: 3)
         }
+        Timings.record("send", step: "mine→confirmed", from: confirmStart)
         Screenshots.capture(app, "08-send-confirmed", testCase: self)
 
         app.tabBars.buttons["Wallet"].tap()
@@ -309,6 +325,7 @@ final class BTCSwiftAppUITests: XCTestCase {
     func test04VaultCreate() throws {
         let app = launchApp()
         app.tabBars.buttons["Vaults"].tap()
+        let createStart = Date()
         app.buttons["newVaultButton"].tap()
 
         app.typeInto("vaultNameField", "E2E Vault")
@@ -333,6 +350,7 @@ final class BTCSwiftAppUITests: XCTestCase {
         app.buttons["saveVaultButton"].tap()
         XCTAssertTrue(app.staticTexts["E2E Vault"].waitForExistence(timeout: 30),
                       "vault was not saved")
+        Timings.record("vault", step: "create", from: createStart)
         XCTAssertTrue(app.staticTexts["2-of-3 · script path"].waitForExistence(timeout: 10))
         Screenshots.capture(app, "11-vault-list", testCase: self)
     }
@@ -429,9 +447,13 @@ final class BTCSwiftAppUITests: XCTestCase {
             // Fallback: type the JSON into the editor (autocorrect disabled).
             app.typeInto("importJSONEditor", json)
         }
+        let verifyStart = Date()
         app.buttons["importVerifyButton"].tap()
         let reportVisible = poll(timeout: 300, interval: 3, "verification report") {
             app.staticTexts["Verification report"].exists
+        }
+        if reportVisible {
+            Timings.record("import", step: "verify", from: verifyStart)
         }
         if !reportVisible {
             Screenshots.capture(app, "debug-06-import", testCase: self)

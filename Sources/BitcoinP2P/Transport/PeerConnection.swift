@@ -12,7 +12,7 @@ public enum PeerError: Error, Equatable {
 }
 
 /// A peer's host/port.
-public struct PeerEndpoint: Equatable, Sendable, Codable, Hashable {
+public struct PeerEndpoint: Equatable, Sendable, Codable, Hashable, CustomStringConvertible {
     public var host: String
     public var port: UInt16
 
@@ -34,10 +34,12 @@ public enum PeerEvent: Sendable {
 /// scope for this phase).
 ///
 /// Lifecycle: `connect()` performs the version/verack handshake (protocol
-/// 70016, services 0, UA "/btc-swift:0.1/", relay=false) and rejects peers
-/// that do not signal NODE_COMPACT_FILTERS. Inbound `ping`/`feefilter` are
-/// handled internally; everything else goes to a waiting request or to the
-/// multicast `events()` stream.
+/// 70016, services 0, UA "/btc-swift:0.1/") and rejects peers that do not
+/// signal NODE_COMPACT_FILTERS. The BIP37 relay flag defaults to false (no
+/// unsolicited tx relay); a client that wants full relay for a bounded
+/// mempool window (docs/read-side.md §2.8) passes `relayPreference: true` at
+/// connect time. Inbound `ping`/`feefilter` are handled internally; everything
+/// else goes to a waiting request or to the multicast `events()` stream.
 public actor PeerConnection {
     public static let protocolVersion: Int32 = 70_016
     public static let userAgent = "/btc-swift:0.1/"
@@ -48,6 +50,9 @@ public actor PeerConnection {
     public let params: NetworkParams
     public let localServices: UInt64
     public let localStartHeight: Int32
+    /// Value of the BIP37 relay flag sent in our version handshake
+    /// (fRelayTransactions): true asks the peer to inv every relayed tx.
+    public let relayPreference: Bool
 
     public private(set) var peerServices: UInt64 = 0
     public private(set) var peerUserAgent = ""
@@ -84,11 +89,13 @@ public actor PeerConnection {
     private static let backlogLimit = 256
 
     public init(endpoint: PeerEndpoint, params: NetworkParams,
-                localServices: UInt64 = 0, localStartHeight: Int32 = 0) {
+                localServices: UInt64 = 0, localStartHeight: Int32 = 0,
+                relayPreference: Bool = false) {
         self.endpoint = endpoint
         self.params = params
         self.localServices = localServices
         self.localStartHeight = localStartHeight
+        self.relayPreference = relayPreference
         framer = MessageFramer(magic: params.magic)
     }
 
@@ -128,7 +135,7 @@ public actor PeerConnection {
             nonce: UInt64.random(in: UInt64.min ... UInt64.max),
             userAgent: Self.userAgent,
             startHeight: localStartHeight,
-            relay: false
+            relay: relayPreference
         )
         try await send(.version(version))
         do {

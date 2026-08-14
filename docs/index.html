@@ -214,6 +214,14 @@
   .spec .n .u{font-size:.42em;font-weight:600;color:var(--ink-2);letter-spacing:-.01em}
   .spec .l{margin-top:.55rem;font-size:.86rem;color:var(--ink-2);line-height:1.35}
 
+  /* ---------- screenshot gallery ---------- */
+  .shots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1rem,2.5vw,1.6rem);
+    margin-top:clamp(2.5rem,5vw,3.5rem)}
+  .shots-grid img{width:100%;height:auto;display:block;border-radius:1.1rem;
+    border:1px solid var(--hair);background:var(--screen-alt)}
+  .shots-grid figcaption{margin-top:.55rem;font-size:.8rem;color:var(--ink-3);text-align:center}
+  .shots-grid .mono{font-family:var(--mono);font-size:.9em}
+
   /* ---------- honest list ---------- */
   .honest{margin-top:clamp(2.5rem,5vw,3.5rem);border-top:1px solid var(--hair)}
   .hrow{display:grid;grid-template-columns:9.5rem 1fr;gap:1.5rem;
@@ -242,6 +250,7 @@
     .feat .copy{text-align:center}
     .feat .copy p{margin-left:auto;margin-right:auto}
     .specs{grid-template-columns:repeat(2,1fr);gap:2.2rem 1.2rem}
+    .shots-grid{grid-template-columns:repeat(2,1fr)}
     .hrow{grid-template-columns:1fr;gap:.35rem}
     nav .nlinks{gap:1.1rem}
   }
@@ -362,21 +371,21 @@
       <p class="kicker">The app</p>
       <h2>Modern Bitcoin. Nothing else.</h2>
       <p class="sub" style="margin-top:1.1rem">Taproot only, so the legacy matrix simply isn't in the binary. Every path you can take is one of these.</p>
-      <p class="caption" style="margin-top:.8rem">Home and Receive are unretouched captures from the automated end-to-end suite on signet; the remaining screens are renderings of the current UI, replaced by captures as the suite grows.</p>
+      <p class="caption" style="margin-top:.8rem">Home, Receive and Send are unretouched captures from the automated end-to-end suite on signet; the vault screen is a rendering of the current UI, replaced by a capture as the suite grows.</p>
     </div>
 
     <div class="feat" style="margin-top:clamp(3.5rem,8vw,6rem)">
       <div class="copy">
         <p class="kicker">Receive</p>
         <h3>A fresh address, every time.</h3>
-        <p>Taproot receiving addresses derived on the device. Payments appear when they confirm in a block — the wallet says “confirmed” rather than inventing an “incoming.”</p>
+        <p>Taproot receiving addresses derived on the device. While the Receive screen is open, the wallet privately watches live transaction relay and flags incoming payments as “unconfirmed” within seconds; they count once confirmed in a block — 0-conf is never called received.</p>
       </div>
       <div class="shot">
         <div class="device">
           <div class="island"></div>
           <div class="screen">
             <img src="screenshots/03-receive.png"
-                 alt="btc-swift receive screen captured on signet: QR code, fresh tb1p taproot address, and the note that payments appear at block confirmation"
+                 alt="btc-swift receive screen captured on signet: QR code, fresh tb1p taproot address, and the note that incoming payments show as unconfirmed while the screen is open"
                  loading="lazy" decoding="async">
           </div>
         </div>
@@ -390,39 +399,12 @@
         <p>Every payment is reviewed in full — destination, amount, fee, rate and inputs — before a signature exists. Pay a normal address or a reusable <span style="font-family:var(--mono);font-size:.9em">sp1…</span> silent-payment code.</p>
       </div>
       <div class="shot">
-        <!-- SCREENSHOT SLOT: shots/send.png -->
         <div class="device">
           <div class="island"></div>
           <div class="screen">
-            <div class="statusbar"><span>9:41</span><span class="rgt">▮▮▮ ᯤ ▮</span></div>
-            <div class="navtitle"><span>Send</span></div>
-            <div class="list">
-              <div class="grp">
-                <div class="grp-h">Destination</div>
-                <div class="row"><span class="lab" style="font-family:var(--mono);font-size:.55rem">sp1qq0shcvfk…7xgtq2</span></div>
-                <div class="row"><span class="lab">Amount</span><span class="val">40,000 sats</span></div>
-              </div>
-              <div class="grp">
-                <div class="grp-h">Fee</div>
-                <div class="row"><span class="lab">Priority</span><span class="val">Medium</span></div>
-                <div class="row"><span class="lab">Resolved rate</span><span class="val">5 sat/vB</span></div>
-                <div class="row"><span class="lab">Network floor</span><span class="val">1 sat/vB</span></div>
-              </div>
-              <div class="grp">
-                <div class="grp-h">Review</div>
-                <div class="row"><span class="lab">Pays</span><span class="val">silent payment</span></div>
-                <div class="row"><span class="lab">Amount</span><span class="val">40,000 sats</span></div>
-                <div class="row"><span class="lab">Fee</span><span class="val">785 sats</span></div>
-                <div class="row"><span class="lab">Inputs</span><span class="val">2</span></div>
-                <div class="row"><span class="lab">Change back</span><span class="val">83,215 sats</span></div>
-                <div class="row"><span class="lab blue">Sign &amp; broadcast</span></div>
-              </div>
-            </div>
-            <div class="tabbar">
-              <div class="tab"><svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10v11h6v-6h6v6h6V10z"/></svg>Wallet</div>
-              <div class="tab on"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none"/></svg>Send</div>
-              <div class="tab"><svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4 6v6c0 5 3.4 9.4 8 10 4.6-.6 8-5 8-10V6z"/></svg>Vaults</div>
-            </div>
+            <img src="screenshots/06-send-review.png"
+                 alt="btc-swift send review captured on signet: destination, amount, fee, rate, inputs and change, all shown before signing"
+                 loading="lazy" decoding="async">
           </div>
         </div>
       </div>
@@ -504,6 +486,55 @@
   </div>
 </section>
 
+<!-- ================= SCREENSHOTS ================= -->
+<section id="screenshots">
+  <div class="wrap">
+    <div class="center narrow">
+      <p class="kicker">Proof, not mockups</p>
+      <h2>Every screen, from the test suite.</h2>
+      <p class="sub" style="margin-top:1.1rem">Unretouched captures from the automated end-to-end suite: the app runs against a local signet node while the test creates the wallet, mines blocks to it, spends from it, builds a vault and verifies an import. Per-scenario timings from the latest run are in <a class="lnk mono" href="screenshots/timings.json">timings.json</a>, regenerated with the screenshots on every run.</p>
+    </div>
+    <div class="shots-grid">
+      <figure>
+        <img src="screenshots/01-onboarding.png"
+             alt="btc-swift onboarding on signet: create or import a wallet"
+             loading="lazy" decoding="async">
+        <figcaption>Onboarding</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshots/07-send-broadcast.png"
+             alt="btc-swift send status captured on signet: transaction broadcast, relayed to a peer, awaiting confirmation"
+             loading="lazy" decoding="async">
+        <figcaption>Broadcast, relayed to peers</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshots/08-send-confirmed.png"
+             alt="btc-swift send status captured on signet: seen in a block"
+             loading="lazy" decoding="async">
+        <figcaption>Seen in a block</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshots/11-vault-list.png"
+             alt="btc-swift vault list captured on signet: a saved 2-of-3 script-path vault"
+             loading="lazy" decoding="async">
+        <figcaption>Vaults</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshots/13-esplora-warning.png"
+             alt="btc-swift esplora opt-in warning captured on signet, naming exactly what the server backend learns"
+             loading="lazy" decoding="async">
+        <figcaption>The opt-in, behind its warning</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshots/14-import-report.png"
+             alt="btc-swift import verification report captured on signet: bundle verified by forward filter scan"
+             loading="lazy" decoding="async">
+        <figcaption>Import, verified</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
 <!-- ================= HONEST ================= -->
 <section id="trade">
   <div class="wrap">
@@ -515,7 +546,7 @@
       <dl class="honest">
         <div class="hrow">
           <dt>Slower news</dt>
-          <dd>Payments show up <b>when they confirm in a block</b>, not the moment they're sent. Filters describe blocks; there is no mempool to watch.</dd>
+          <dd>Payments appear <b>when they confirm in a block</b> — with one bounded exception: while the Receive screen is open, the app privately watches live relay traffic (it fetches every relayed transaction, indistinguishable from a full node, so nothing is revealed) and shows incoming payments as <b>unconfirmed in seconds</b>. Close the screen and the window closes. Everything else waits for confirmation — and unconfirmed is never called received.</dd>
         </div>
         <div class="hrow">
           <dt>Coarser fees</dt>
@@ -566,7 +597,7 @@
 (function(){
   /* ---- scroll reveals ---- */
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var targets = document.querySelectorAll('.feat, .specs, .honest, .proof');
+  var targets = document.querySelectorAll('.feat, .specs, .honest, .proof, .shots-grid');
   targets.forEach(function(el){ el.classList.add('reveal'); });
   if(reduce || !('IntersectionObserver' in window)){
     targets.forEach(function(el){ el.classList.add('in'); });

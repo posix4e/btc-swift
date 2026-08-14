@@ -1,0 +1,85 @@
+{
+  "device" : "iPhone 17",
+  "run" : "2026-08-14T20:33:53Z",
+  "scenarios" : [
+    {
+      "name" : "onboarding",
+      "steps" : [
+        {
+          "seconds" : 1.86,
+          "step" : "wallet-create"
+        },
+        {
+          "seconds" : 3.08,
+          "step" : "backup→home"
+        }
+      ]
+    },
+    {
+      "name" : "receive",
+      "steps" : [
+        {
+          "seconds" : 2.15,
+          "step" : "address-shown"
+        }
+      ]
+    },
+    {
+      "name" : "funding",
+      "steps" : [
+        {
+          "seconds" : 40.99,
+          "step" : "mine-101-blocks"
+        },
+        {
+          "seconds" : 0.99,
+          "step" : "mined→detected-by-filters"
+        }
+      ]
+    },
+    {
+      "name" : "send",
+      "steps" : [
+        {
+          "seconds" : 0.65,
+          "step" : "form→broadcast"
+        },
+        {
+          "seconds" : 0.01,
+          "step" : "broadcast→echo/relay"
+        },
+        {
+          "seconds" : 6.09,
+          "step" : "mine→confirmed"
+        }
+      ]
+    },
+    {
+      "name" : "vault",
+      "steps" : [
+        {
+          "seconds" : 35.05,
+          "step" : "create"
+        }
+      ]
+    },
+    {
+      "name" : "import",
+      "steps" : [
+        {
+          "seconds" : 18.94,
+          "step" : "verify"
+        }
+      ]
+    }
+  ],
+  "totals" : {
+    "all" : 109.81,
+    "funding" : 41.98,
+    "import" : 18.94,
+    "onboarding" : 4.94,
+    "receive" : 2.15,
+    "send" : 6.75,
+    "vault" : 35.05
+  }
+}
