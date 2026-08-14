@@ -40,6 +40,7 @@ final class BTCSwiftAppUITests: XCTestCase {
         var amount: Int64
         var scriptPubKey: String // hex
         var height: Int
+        var index: UInt32 // receive-chain index of the funded address
     }
     nonisolated(unsafe) static var funding: FundingInfo?
 
@@ -103,16 +104,19 @@ final class BTCSwiftAppUITests: XCTestCase {
         if button.exists, button.isEnabled { button.tap() }
     }
 
-    /// Scrolls the first collection view until `element` exists (SwiftUI
+    /// Scrolls the topmost scroll view until `element` exists (SwiftUI
     /// Forms materialize rows lazily — `exists` is false below the fold).
+    /// Uses screen-coordinate drags: a TabView keeps every tab's list in the
+    /// accessibility tree, so element-based swipes can hit a hidden tab's
+    /// list instead of the visible form.
     @discardableResult
     func scrollUntilExists(_ app: XCUIApplication, _ element: XCUIElement,
                            maxSwipes: Int = 10, up: Bool = false) -> Bool {
         for _ in 0 ... maxSwipes {
             if element.waitForExistence(timeout: 2) { return true }
-            let list = app.collectionViews.firstMatch
-            guard list.exists else { return element.exists }
-            up ? list.swipeDown() : list.swipeUp()
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.30 : 0.62))
+            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.62 : 0.30))
+            start.press(forDuration: 0.05, thenDragTo: end)
         }
         return element.exists
     }
@@ -168,6 +172,16 @@ final class BTCSwiftAppUITests: XCTestCase {
         }
         app.buttons["Done"].tap()
 
+        // Which receive-chain index did the app show? (It advances once an
+        // address is used, so resolve it rather than assuming 0.)
+        var fundingIndex: UInt32?
+        for i: UInt32 in 0 ..< 10
+        where try Self.walletReceiveAddress(index: i) == address { fundingIndex = i }
+        guard let fundingIndex else {
+            XCTFail("the displayed address is not index 0..<10 of the fixed-entropy wallet")
+            return
+        }
+
         // Fund it from the host: 101 blocks paying the receive address, so the
         // first coinbase is spendable by the time the send test runs.
         let script = try AddressDecoder.scriptPubKey(for: address, network: .signet)
@@ -176,7 +190,8 @@ final class BTCSwiftAppUITests: XCTestCase {
         let fundingTxid = try BitcoinCLI.coinbaseTxid(blockHash: firstHash)
         let output = try BitcoinCLI.outputZero(txid: fundingTxid)
         Self.saveFunding(FundingInfo(txid: fundingTxid, amount: output.amount,
-                                     scriptPubKey: output.scriptPubKey, height: startHeight + 1))
+                                     scriptPubKey: output.scriptPubKey, height: startHeight + 1,
+                                     index: fundingIndex))
         for _ in 0 ..< 100 {
             try await SignetMiner.mineBlock(payingTo: script)
         }
@@ -198,27 +213,17 @@ final class BTCSwiftAppUITests: XCTestCase {
     func test03Send() async throws {
         // Send 0.01 BTC back out to a fixture address derived in-process
         // (the node's "miner" wallet is a signing-only wallet with no
-        // keypool — it can't hand out receive addresses). The app gets the
-        // destination on its own pasteboard via BTCSWIFT_E2E_CLIPBOARD.
+        // keypool — it can't hand out receive addresses). Typed, not pasted:
+        // cross-process pasteboard consent prompts proved flaky.
         let destination = try Self.fixtureAddress(0xC3)
-        let app = launchApp(clipboard: destination)
+        let app = launchApp()
         XCTAssertTrue(poll(timeout: 120, "persisted funded balance") {
             self.balanceText(app) != "0 sats" && self.balanceText(app) != ""
         })
 
         app.tabBars.buttons["Send"].tap()
-        XCTAssertTrue(app.buttons["pasteDestinationButton"].waitForExistence(timeout: 20))
-        app.buttons["pasteDestinationButton"].tap()
-        XCTAssertTrue(poll(timeout: 15, interval: 1, "destination pasted") {
-            (app.textFields["destinationField"].value as? String) == destination
-        })
+        app.typeInto("destinationField", destination)
         app.typeInto("amountField", "1000000")
-        // The number pad has no return key and swallows the first outside
-        // tap; switching tabs resigns the field (TabView keeps form state).
-        if app.keyboards.firstMatch.exists {
-            app.tabBars.buttons["Wallet"].tap()
-            app.tabBars.buttons["Send"].tap()
-        }
         Screenshots.capture(app, "05-send-form", testCase: self)
 
         app.buttons["reviewButton"].tap()
@@ -226,6 +231,8 @@ final class BTCSwiftAppUITests: XCTestCase {
         // materialize rows lazily, so scroll it into existence.
         let sendButton = app.buttons["sendButton"]
         if !scrollUntilExists(app, sendButton, maxSwipes: 5) {
+            Screenshots.capture(app, "debug-03-scrolled", testCase: self)
+            print("E2E debug buttons after scroll: \(app.buttons.allElementsBoundByIndex.map(\.identifier))")
             app.buttons["reviewButton"].tap() // in case the tap was eaten by the keyboard
             _ = scrollUntilExists(app, sendButton, maxSwipes: 5)
         }
@@ -239,22 +246,28 @@ final class BTCSwiftAppUITests: XCTestCase {
         XCTAssertTrue(sendButton.exists, "no review section")
         Screenshots.capture(app, "06-send-review", testCase: self)
 
+        let mempoolBefore = Set(try BitcoinCLI.mempoolTxids())
         app.buttons["sendButton"].tap()
         XCTAssertTrue(poll(timeout: 60, "broadcast status") {
             app.staticTexts["broadcastPending"].exists || app.staticTexts["broadcastConfirmed"].exists
         })
         Screenshots.capture(app, "07-send-broadcast", testCase: self)
 
-        // Confirm it: mine one block (paying a fixture address), then poll the
-        // send view's "Seen in block N" — nudging syncs from the Wallet tab.
+        // Wait until the node actually has the tx (inv → getdata relay takes
+        // a moment after the UI reports the broadcast), THEN mine.
+        poll(timeout: 60, interval: 1, "tx relayed into the node's mempool") {
+            ((try? Set(BitcoinCLI.mempoolTxids()).isSubset(of: mempoolBefore)) ?? true) == false
+        }
         let payout = try AddressDecoder.scriptPubKey(for: Self.fixtureAddress(0xD4), network: .signet)
         try await SignetMiner.mineBlock(payingTo: payout)
+
+        // The "Seen in block N" label is a lazily-materialized row below the
+        // fold — nudge syncs from the Wallet tab, then scroll to it.
         poll(timeout: 240, interval: 5, "send confirmation") {
-            if app.staticTexts["broadcastConfirmed"].exists { return true }
             app.tabBars.buttons["Wallet"].tap()
             self.nudgeSync(app)
             app.tabBars.buttons["Send"].tap()
-            return app.staticTexts["broadcastConfirmed"].exists
+            return self.scrollUntilExists(app, app.staticTexts["broadcastConfirmed"], maxSwipes: 3)
         }
         Screenshots.capture(app, "08-send-confirmed", testCase: self)
 
@@ -282,6 +295,15 @@ final class BTCSwiftAppUITests: XCTestCase {
         let master = try HDKey(seed: Data(repeating: byte, count: 64))
         let account = try BIP86.accountKey(from: master, coinType: 1, account: 0)
         return try BIP86.address(internalKey: account.publicKey.dropFirst(), hrp: "tb")
+    }
+
+    /// The fixed-entropy test wallet's receive address at `index`
+    /// (m/86'/1'/0'/0/index, signet).
+    static func walletReceiveAddress(index: UInt32) throws -> String {
+        let master = try HDKey(seed: BIP39.seed(mnemonic: mnemonic))
+        let account = try BIP86.accountKey(from: master, coinType: 1, account: 0)
+        let key = try account.derived(path: "0/\(index)")
+        return try BIP86.address(internalKey: key.publicKey.dropFirst(), hrp: "tb")
     }
 
     func test04VaultCreate() throws {
@@ -378,8 +400,8 @@ final class BTCSwiftAppUITests: XCTestCase {
             "lastKnownHeight": funding.height,
             "utxos": [[
                 "txid": funding.txid, "vout": 0, "amount": funding.amount,
-                "scriptPubKey": funding.scriptPubKey, "chain": 0, "index": 0,
-                "height": funding.height,
+                "scriptPubKey": funding.scriptPubKey, "chain": 0,
+                "index": funding.index, "height": funding.height,
             ]],
             "transactions": [[
                 "txid": funding.txid, "height": funding.height,
@@ -393,11 +415,33 @@ final class BTCSwiftAppUITests: XCTestCase {
         app.buttons["importWalletButton"].tap()
         XCTAssertTrue(app.buttons["importPasteButton"].waitForExistence(timeout: 20))
         app.buttons["importPasteButton"].tap()
+        // The system may still ask for paste consent — allow it, retry.
+        let allowPaste = app.buttons["Allow Paste"]
+        let pasted = poll(timeout: 15, interval: 1, "bundle pasted") {
+            if allowPaste.exists { allowPaste.tap() }
+            if ((app.textViews["importJSONEditor"].value as? String) ?? "").contains("lastKnownHeight") {
+                return true
+            }
+            if app.buttons["importPasteButton"].exists { app.buttons["importPasteButton"].tap() }
+            return false
+        }
+        if !pasted {
+            // Fallback: type the JSON into the editor (autocorrect disabled).
+            app.typeInto("importJSONEditor", json)
+        }
         app.buttons["importVerifyButton"].tap()
-        XCTAssertTrue(app.staticTexts["Verification report"].waitForExistence(timeout: 300)
-                        || app.otherElements["importReportSection"].waitForExistence(timeout: 5),
-                      "no verification report")
+        let reportVisible = poll(timeout: 300, interval: 3, "verification report") {
+            app.staticTexts["Verification report"].exists
+        }
+        if !reportVisible {
+            Screenshots.capture(app, "debug-06-import", testCase: self)
+            let texts = app.staticTexts.allElementsBoundByIndex.map(\.label)
+            print("E2E debug import staticTexts: \(texts)")
+        }
+        XCTAssertTrue(reportVisible, "no verification report")
         Screenshots.capture(app, "14-import-report", testCase: self)
+        XCTAssertTrue(scrollUntilExists(app, app.buttons["importContinueButton"]),
+                      "no Continue button after report")
         app.buttons["importContinueButton"].tap()
         XCTAssertTrue(app.staticTexts["balanceText"].waitForExistence(timeout: 60),
                       "wallet home did not appear after import")

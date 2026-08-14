@@ -64,10 +64,12 @@ extension XCTestCase {
 }
 
 extension XCUIApplication {
-    /// Types into a field and dismisses the software keyboard afterwards.
+    /// Types into a field (TextField or TextEditor) and dismisses the
+    /// software keyboard afterwards.
     @MainActor
     func typeInto(_ identifier: String, _ text: String) {
-        let field = textFields[identifier]
+        var field = textFields[identifier]
+        if !field.exists { field = textViews[identifier] }
         XCTAssertTrue(field.waitForExistence(timeout: 20), "no text field \(identifier)")
         field.tap()
         field.typeText(text)
@@ -82,9 +84,15 @@ extension XCUIApplication {
             returnKey.tap()
             return
         }
-        // Keypads without a return key get an input-accessory Done button.
+        // Keypads without a return key get an input-accessory Done button
+        // (a toolbar floating above the keyboard).
+        let toolbarDone = toolbars.buttons["Done"]
+        if toolbarDone.waitForExistence(timeout: 2), toolbarDone.isHittable {
+            toolbarDone.tap()
+            return
+        }
         let doneKey = keyboards.buttons["Done"]
-        if doneKey.waitForExistence(timeout: 2), doneKey.isHittable {
+        if doneKey.exists, doneKey.isHittable {
             doneKey.tap()
             return
         }

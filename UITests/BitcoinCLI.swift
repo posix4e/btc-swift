@@ -172,4 +172,9 @@ enum BitcoinCLI {
         }
         return txid
     }
+
+    /// Current mempool txids (display hex).
+    static func mempoolTxids() throws -> [String] {
+        (try runJSON(["getrawmempool"]) as? [String]) ?? []
+    }
 }

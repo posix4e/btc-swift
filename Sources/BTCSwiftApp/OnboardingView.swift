@@ -152,6 +152,8 @@ private struct ImportBundleView: View {
                     TextEditor(text: $json)
                         .font(.system(.caption, design: .monospaced))
                         .frame(minHeight: 160)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
                         .accessibilityIdentifier("importJSONEditor")
                     Button("Paste from clipboard") {
                         json = UIPasteboard.general.string ?? ""

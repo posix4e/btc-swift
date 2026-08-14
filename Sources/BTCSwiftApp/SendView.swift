@@ -109,7 +109,6 @@ struct SendView: View {
                             .accessibilityIdentifier("sendButton")
                             .disabled(sending)
                     }
-                    .accessibilityIdentifier("reviewSection")
                 }
 
                 if let sentTxid {
@@ -132,7 +131,6 @@ struct SendView: View {
                         }
                         Button("New payment") { reset() }
                     }
-                    .accessibilityIdentifier("broadcastSection")
                 }
             }
             .navigationTitle("Send")
