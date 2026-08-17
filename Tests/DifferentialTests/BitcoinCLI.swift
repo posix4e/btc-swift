@@ -51,10 +51,20 @@ enum BitcoinCLI {
         return nil
     }
 
-    /// bitcoin-cli binary: /opt/homebrew/bin first, then PATH.
+    /// bitcoin-cli binary: both Homebrew prefixes, then PATH.
+    ///
+    /// `/usr/local/bin` is where Homebrew installs on Intel, and the CI
+    /// runners are x86_64. Probing only the Apple-silicon prefix is what made
+    /// the UI e2e suite unrunnable on `runner-1-btc` in run 31987164939 —
+    /// `bitcoin-cli` was at `/usr/local/bin/bitcoin-cli` the whole time. It
+    /// went unnoticed because every machine that had ever run these suites
+    /// was Apple silicon: CI skipped the UI leg for want of Xcode, and the
+    /// developer machines all had `/opt/homebrew`.
+    static let homebrewPaths = ["/opt/homebrew/bin/bitcoin-cli",  // Apple silicon
+                                "/usr/local/bin/bitcoin-cli"]     // Intel
     static var binaryPath: String? {
-        let homebrew = "/opt/homebrew/bin/bitcoin-cli"
-        if FileManager.default.isExecutableFile(atPath: homebrew) { return homebrew }
+        for candidate in homebrewPaths
+        where FileManager.default.isExecutableFile(atPath: candidate) { return candidate }
         // which(1) lookup for non-standard installs.
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/which")
@@ -75,7 +85,7 @@ enum BitcoinCLI {
     static func run(_ arguments: [String], wallet: String? = nil) throws -> String {
         guard let binary = binaryPath else {
             throw CLIError(arguments: arguments, status: -1,
-                           output: "bitcoin-cli not found (/opt/homebrew/bin or PATH)")
+                           output: "bitcoin-cli not found (tried \(homebrewPaths.joined(separator: ", ")), then PATH)")
         }
         var full = ["-datadir=\(datadir)", "-rpcport=\(rpcPort)", "-rpcconnect=\(nodeHost)"]
         if let wallet { full.append("-rpcwallet=\(wallet)") }

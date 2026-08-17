@@ -81,10 +81,25 @@ enum BitcoinCLI {
         return nil
     }
 
-    /// bitcoin-cli binary: /opt/homebrew/bin first, then PATH.
+    /// bitcoin-cli binary: both Homebrew prefixes, then PATH.
+    ///
+    /// `/usr/local/bin` is where Homebrew installs on Intel, and the CI
+    /// runners are x86_64. Probing only the Apple-silicon prefix is what made
+    /// this suite unrunnable on `runner-1-btc` in run 31987164939 —
+    /// `bitcoin-cli` was at `/usr/local/bin/bitcoin-cli` the whole time, and
+    /// `test00CanSpawnHostProcesses` failed at the very first RPC.
+    ///
+    /// The `which` fallback below cannot rescue it **here**: `HostProcess`
+    /// spawns with a null `envp` (`HostProcess.swift:47`), so the child gets
+    /// no `PATH` and `which` finds nothing. The differential copy of this file
+    /// survives the same bug only because it spawns via Foundation `Process`,
+    /// which inherits the runner's environment. So on this side the prefix
+    /// list is the lookup, not a fast path in front of one.
+    static let homebrewPaths = ["/opt/homebrew/bin/bitcoin-cli",  // Apple silicon
+                                "/usr/local/bin/bitcoin-cli"]     // Intel
     static var binaryPath: String? {
-        let homebrew = "/opt/homebrew/bin/bitcoin-cli"
-        if FileManager.default.isExecutableFile(atPath: homebrew) { return homebrew }
+        for candidate in homebrewPaths
+        where FileManager.default.isExecutableFile(atPath: candidate) { return candidate }
         // which(1) lookup for non-standard installs.
         guard let result = try? HostProcess.run("/usr/bin/which", ["bitcoin-cli"]),
               result.status == 0
@@ -99,7 +114,7 @@ enum BitcoinCLI {
     static func run(_ arguments: [String], wallet: String? = nil) throws -> String {
         guard let binary = binaryPath else {
             throw CLIError(arguments: arguments, status: -1,
-                           output: "bitcoin-cli not found (/opt/homebrew/bin or PATH)")
+                           output: "bitcoin-cli not found (tried \(homebrewPaths.joined(separator: ", ")), then PATH)")
         }
         var full = ["-datadir=\(datadir)", "-rpcport=\(rpcPort)", "-rpcconnect=\(nodeHost)"]
         if let wallet { full.append("-rpcwallet=\(wallet)") }
