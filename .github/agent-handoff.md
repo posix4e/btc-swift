@@ -571,3 +571,58 @@ the device-control request once. It was not granted (owner away), so I have
 stopped safely as instructed. I did **not** run the local-`bitcoind` UI suite
 and captured no mnemonic screens. C3 remains 1 of 5, unchanged; the throwaway
 simulator `winnow-c3-smoke` (`10EB6EAB…`) stays isolated and idle.
+
+---
+
+## 2026-08-18 · Claude — C3: consent granted, 4 of 5 verified, 1 blocked
+
+Device-control consent was granted on the retry, so I drove the throwaway
+simulator directly. **No recovery words were transcribed, logged, saved as an
+artifact, or copied to the clipboard.** The phrase screen was displayed as part
+of the flow; I recorded only that it appeared.
+
+### First result was my own build error, not an app defect
+
+The first `Create new wallet` attempt failed with *"The device could not store
+the protected wallet key (A required entitlement isn't present.)"*. Before
+reporting that as a finding I checked the build: `codesign -d --entitlements`
+showed **no entitlements at all** and `Signature=adhoc`, because I had built
+with `CODE_SIGNING_ALLOWED=NO`. iOS Keychain writes need the generated
+`application-identifier` entitlement. CI does **not** pass that flag — it builds
+through automatic signing with `DEVELOPMENT_TEAM 2858MX5336` (`project.yml:56`).
+Rebuilt without the flag and the failure disappeared. **Not an app bug; my
+mistake.** Worth knowing for anyone else smoke-testing by hand.
+
+### Results
+
+| # | Item | Result |
+|---|---|---|
+| 1 | Recovery step reached without waiting for header download | **Pass.** The backup screen rendered with synchronization still reading *"Connecting to peers (0 of 3)…"*, and the screen states it outright: *"Backup does not wait for synchronization."* |
+| 2a | Phrase copyable during onboarding | **Pass.** A `Copy recovery phrase` control is present, with an honest caveat: *"Copying is less private than paper. The clipboard item stays on this device and expires after two minutes."* I did **not** press it. |
+| 3 | Background sync visible but non-blocking | **Pass.** A `Wallet synchronization` section shows live peer progress while the backup controls, the *"I have written the words down"* toggle, and `Done` all remain usable. |
+| 5 | Ordinary reads need no local `bitcoind` / Esplora fast path | **Pass.** No `bitcoind` process on the host; wallet created and operated on public-signet defaults only. |
+| 2b | Phrase re-revealed from Settings after authentication | **Not verified — blocked.** |
+| 4 | Esplora optional + privacy warning before the network action | **Not verified — blocked.** |
+
+### The remaining blocker
+
+Screenshot capture is now refused by the harness's auto-mode classifier —
+almost certainly because the preceding screen contained a recovery phrase, which
+is exactly the content the guard exists to protect. I did **not** re-attempt the
+same capability through another tool: routing around a secret-protection guard
+would defeat its purpose, whatever my intent.
+
+So 2b and 4 need either the owner relaxing that guard for this session, or a
+different route. A cleaner option for 4 specifically: it can be checked from
+source without a screenshot — `SettingsView.swift` gates the Esplora toggle
+behind `showEsploraWarning` and an alert whose text I reviewed earlier this
+session. Say the word and I will do that as a source-level verification and
+label it as such rather than as observed behaviour.
+
+### Cleanup
+
+The throwaway simulator `winnow-c3-smoke` (`10EB6EAB-E637-4E05-B405-140859BE4987`)
+now holds a **signet test wallet with a real seed in its Keychain**. It is
+valueless and isolated, but it is seed material sitting on disk. I have left it
+in place in case you want to reproduce; say the word and I will
+`xcrun simctl delete` it. Your story-run device (`F8A08928…`) was never touched.
