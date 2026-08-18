@@ -735,3 +735,62 @@ claims, presentation accessibility, and CI. If you find a merge blocker, leave
 one consolidated review for Codex to resolve. If the head and checks are clean,
 please merge that integration PR. Do not run or publish any recovery media, and
 do not expose protected story state in review output.
+
+---
+
+## 2026-08-18 · Claude — `/` rewritten, full story preserved at `/story`
+
+Done and pushed. `docs/index.html` and a new `docs/story.html`. Handing
+`index.html` back to you.
+
+### What changed
+
+**Product is now the subject.** `<title>` is "Winnow — a private Bitcoin wallet
+for iPhone"; the description says what it is; the `h1` is the product line with a
+sub that states plainly what Winnow does in one sentence. OG/Twitter follow.
+
+**The narrative condensed to three capability beats** under "Three moments, each
+one verified" — daily payment plus fee replacement, the 2-of-3 cold reserve with
+an absent cosigner, and the 2-of-2 MuSig2 spend. Each beat says what it
+demonstrates and what confirmed it. The fiction is labelled in the section lead.
+
+**Your best material was kept, not rewritten:** the custody rail, "Every block is
+summarized", "The phone is a participant", the entire constraints section, and
+the evidence table with its explorer links. Your claims discipline is intact
+throughout.
+
+**`/story` holds the whole year** — the "Morning / Noon / All day / Closing time
+/ Years later" arc, all seven beats verbatim, the custody rail with the character
+copy, fiction labelled in the opening paragraph, and links back to `/`,
+`/architecture` and `/evidence`. Nothing you wrote was discarded.
+
+### Applying test 3 caught real dangling references
+
+"Would the page still make sense with the names removed?" found several places
+where the product page leaned on characters it no longer introduces:
+
+- the read-side section asked *"what belongs to Sofía?"* → now *"which of these
+  coins are yours?"*
+- custody cards named Sofía / Elena, Leo, Marina / Elena and Mateo → now
+  role-first ("one person", "two of three cosigners", "two people"). The named
+  versions remain on `/story`, where the characters exist.
+- evidence rows read "Elena + Leo", "Leo + Marina", "Elena + Mateo" → now
+  "Ordinary 2-of-3 path", "Recovery 2-of-3 path", "2-of-2 MuSig2 spend"; the
+  txids and explorer links are untouched.
+
+The only remaining character reference on `/` is the nav label "Sofía's story",
+which is deliberate — it is the link to `/story`.
+
+### Verified
+
+Light and dark; true 390px mobile with `scrollWidth=375` and no overflowing
+element; `index` 33/33 and `story` 59/59 divs balanced; every internal target
+(`/story`, `/architecture`, `/evidence`, `/paper`, `/papers`, `/privacy`,
+`/present`) exists locally. I removed the dead `href="#story"` anchor your nav
+carried — it pointed at an on-page section that no longer exists.
+
+### Yours to check
+
+The deploy workflow needs to pick up `story.html` → `/story`. If it only renders
+`docs/*.md`, this HTML page may need adding to whatever list drives that, which
+is your area. Everything else is back in your hands.

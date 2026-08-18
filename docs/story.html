@@ -3,19 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Winnow — a private Bitcoin wallet for iPhone</title>
-<meta name="description" content="A Taproot-only Bitcoin wallet for iPhone. It matches compact block filters on the device, so no wallet server is asked which addresses are yours. Hot wallet, 2-of-3 cold reserve, and 2-of-2 MuSig2 in one app.">
-<link rel="canonical" href="https://winnowwallet.com/">
+<title>Winnow — the café-to-vault story</title>
+<meta name="description" content="A worked example of Winnow across three custody models: a café till, a 2-of-3 cold reserve, and a 2-of-2 joint reserve. The people are fictional; the transactions are real and confirmed on public signet.">
+<link rel="canonical" href="https://winnowwallet.com/story">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f7931a'/%3E%3Cpath d='M7 9h18L18 19v5l-4 2v-7z' fill='%23fff'/%3E%3C/svg%3E">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://winnowwallet.com/">
-<meta property="og:title" content="Winnow — a private Bitcoin wallet for iPhone">
-<meta property="og:description" content="Compact block filters, matched on the device. No wallet server learns your addresses. Hot, cold, and joint custody in one Taproot-only app.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://winnowwallet.com/story">
+<meta property="og:title" content="Winnow — the café-to-vault story">
+<meta property="og:description" content="One year, three custody models, every transaction confirmed on public signet.">
 <meta property="og:image" content="https://winnowwallet.com/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Winnow — a private Bitcoin wallet for iPhone">
-<meta name="twitter:description" content="Compact block filters, matched on the device. No wallet server learns your addresses.">
-<meta name="twitter:image" content="https://winnowwallet.com/og.png">
 <style>
   /* ── tokens ─────────────────────────────────────────────── */
   :root{
@@ -324,7 +321,7 @@
       Winnow
     </span>
     <div class="nav-links">
-      <a href="/story">Sofía's story</a>
+      <a href="#story">Sofía's story</a>
       <a href="#how" class="hide-xs">How it works</a>
       <a href="/architecture" class="hide-xs">Architecture</a>
       <a href="/paper">Paper</a>
@@ -332,179 +329,148 @@
     </div>
   </div>
 </nav>
-<header class="hero">
-  <div class="wrap hero-grid">
-    <div class="copy">
-      <p class="eyebrow">Bitcoin wallet · iPhone</p>
-      <h1>It finds your money.<span class="soft">It asks no one.</span></h1>
-      <p class="sub">Winnow is a Taproot-only Bitcoin wallet for iPhone. It pulls compact block
-      filters from ordinary Bitcoin peers and matches them against your keys <em>on the device</em>,
-      so no wallet server is ever told which addresses are yours. Everyday spending, a shared cold
-      reserve, and a joint reserve all live in one app.</p>
-      <div class="cta">
-        <a class="btn" href="https://testflight.apple.com/join/83djpNE7">Join the public beta</a>
-        <a class="btn ghost" href="#how">How it works</a>
-      </div>
-      <p class="caption" style="margin-top:1.4rem">Public beta on TestFlight · signet by default, where coins have no value · <a href="https://github.com/posix4e/winnow">source</a></p>
-    </div>
-    <div class="shot-col">
-      <div class="device"><div class="island"></div><div class="screen">
-        <img src="screenshots/03-receive.png" width="1320" height="2868" fetchpriority="high"
-             alt="Winnow's receive screen: a QR code and a fresh Taproot address beginning tb1p.">
-      </div></div>
-    </div>
+<header class="hero" style="padding-bottom:clamp(2rem,4vw,3rem)">
+  <div class="wrap">
+    <p class="eyebrow">A worked example</p>
+    <h1 style="max-width:34rem">From the café till.<span class="soft">To the family vault.</span></h1>
+    <p class="sub" style="margin-top:1.3rem">One year in the life of a wallet, used three different ways.
+    Sofía Cruz, Brisa Café, Harbor Exchange, Ceiba Trust and the Rivera family are <b>fictional</b>.
+    Everything they do here was executed end to end by the automated suite against public signet, and
+    every transaction is linked and open to inspection.</p>
+    <p class="caption" style="margin-top:1.2rem"><a href="/">← Back to Winnow</a> &nbsp;·&nbsp;
+      <a href="/evidence">The evidence summary →</a></p>
   </div>
 </header>
-
-<section id="custody">
-  <div class="wrap">
-    <p class="eyebrow">Three levels, one app</p>
-    <h2>One person does not need one custody model.</h2>
-    <p class="sub" style="margin-top:1rem;max-width:44rem">Daily money should be quick. Savings should
-    need more than one person. A joint reserve should look like nothing unusual on chain. Winnow ships
-    all three as Taproot descriptors over the same chain, filter, and signing machinery.</p>
-<div class="custody-rail" aria-label="Three layers of custody">
+<section id="levels"><div class="wrap"><div class="custody-rail" aria-label="Three layers of custody">
       <div class="custody-level hot">
         <span class="num">01 · daily</span>
         <h3>Café hot wallet</h3>
-        <p>One person can receive customers and pay suppliers straight from the phone.</p>
+        <p>Sofía alone can receive customers and pay suppliers from her phone.</p>
       </div>
       <div class="custody-level cold">
         <span class="num">02 · savings</span>
         <h3>2-of-3 cold reserve</h3>
-        <p>Two of three cosigners are required, so one missing key is survivable.</p>
+        <p>Two of Elena, Leo, and Marina are required. One missing key is survivable.</p>
       </div>
       <div class="custody-level joint">
         <span class="num">03 · family</span>
         <h3>2-of-2 joint reserve</h3>
-        <p>Two people cooperate with MuSig2; the chain sees an ordinary Taproot spend.</p>
+        <p>Elena and Mateo cooperate with MuSig2; the chain sees an ordinary Taproot spend.</p>
       </div>
-    </div>
-  </div>
-</section>
-
-<section class="alt" id="in-practice">
-  <div class="wrap">
-    <p class="eyebrow">What that looks like in practice</p>
-    <h2>Three moments, each one verified.</h2>
-    <p class="sub" style="margin-top:1rem;max-width:44rem">A worked example, run end to end against
-    public signet by the automated suite. The people and businesses are invented; every transaction
-    below is real and open to inspection.</p>
-
-    <div class="practice">
-      <article class="pbeat">
-        <span class="pnum">01 · daily</span>
-        <h3>Take a payment, then fix a fee</h3>
-        <p>A café till receives to a fresh Taproot address, and the incoming payment can be observed
-        as unconfirmed while the Receive screen stays open. When a supplier payment is priced too low,
-        it is replaced rather than stranded — every spend signals RBF.</p>
-        <p class="pev">Verified: customer funding, then a two-step replacement chain whose final
-        transaction confirmed.</p>
-      </article>
-      <article class="pbeat">
-        <span class="pnum">02 · savings</span>
-        <h3>Move the excess somewhere one person cannot spend it</h3>
-        <p>A 2-of-3 reserve holds savings behind a script path with an unspendable internal key, so
-        there is no hidden single-key escape hatch. Years later a cosigner is unavailable, and the
-        remaining two recover without them.</p>
-        <p class="pev">Verified: cold-reserve funding, an ordinary two-cosigner spend, and an
-        independent recovery path that confirmed without the third.</p>
-      </article>
-      <article class="pbeat">
-        <span class="pnum">03 · together</span>
-        <h3>Two people agree, and the chain sees one signature</h3>
-        <p>A 2-of-2 MuSig2 reserve needs both people, coordinated over PSBTs with no wallet server in
-        the middle. The result is an ordinary Taproot key-path spend: on chain the witness shape and
-        fee are those of an everyday payment, revealing no script.</p>
-        <p class="pev">Verified: confirmed with a single 64-byte witness item and no revealed script.</p>
-      </article>
-    </div>
-
-    <p class="caption" style="margin-top:1.6rem">
-      <a href="/story">Read the whole story, from the first morning to the replacement phone →</a>
-      &nbsp;·&nbsp; <a href="/evidence">See the transactions →</a>
-    </p>
-  </div>
-</section>
-<section class="night" id="how">
-  <div class="wrap center narrow">
-    <p class="eyebrow">How it works</p>
-    <h2>Every block is summarized. The phone keeps what matters.</h2>
-    <p class="sub" style="margin-top:1.2rem">Winnow verifies the proof-of-work header chain, downloads compact summaries from ordinary Bitcoin peers, and checks them against wallet scripts <em>on the device</em>. A peer serves public chain data rather than answering “which of these coins are yours?”</p>
-  </div>
-  <div class="wrap">
-    <canvas id="sieve" aria-hidden="true"></canvas>
-    <div class="counters" role="status" aria-live="off">
-      <span>blocks winnowed <b id="c-blocks">0</b></span>
-      <span>yours <b id="c-yours">0</b></span>
-      <span class="zero">addresses revealed <b id="c-told">0</b></span>
-    </div>
-    <p class="note center" style="margin-top:1.4rem;max-width:34rem;margin-inline:auto">
-      The last counter is the point: standard wallet discovery does not send an address to a wallet server.
-      <a href="/architecture" style="color:var(--mark)">See the architecture move →</a>
-    </p>
-  </div>
-</section><section style="background:var(--paper-2)">
-  <div class="wrap center narrow">
-    <p class="eyebrow">What Winnow changes</p>
-    <h2>The phone is a participant, not a remote control.</h2>
-  </div>
-  <div class="wrap">
-    <div class="special-grid">
-      <article class="special"><span class="index">01 · local first</span><h3>Keys now, chain later</h3><p>Create and back up a wallet without waiting for header synchronization. The recovery phrase remains available from Settings behind device authentication.</p></article>
-      <article class="special"><span class="index">02 · read privately</span><h3>Bitcoin peers, not wallet queries</h3><p>Headers establish chainwork. Compact filters bring public block summaries to the phone. Matching happens locally.</p></article>
-      <article class="special"><span class="index">03 · pay directly</span><h3>Review, sign, relay, replace</h3><p>Transactions are assembled and signed on-device, relayed to peers, and tracked through explicit RBF replacement links.</p></article>
-      <article class="special"><span class="index">04 · custody fits the money</span><h3>Hot, shared, and jointly private</h3><p>One app expresses a daily BIP86 wallet, script-path k-of-n reserves, and MuSig2 n-of-n reserves without a coordinator service.</p></article>
-      <article class="special"><span class="index">05 · portable history</span><h3>Recovery includes context</h3><p>An export carries the wallet's public history and scan frontier so a replacement phone can verify forward instead of asking an indexer to reconstruct the past.</p></article>
-      <article class="special"><span class="index">06 · honest switches</span><h3>External services are visible</h3><p>Explorer links and experimental Silent Payment receiving sit behind plain warnings. A convenience does not quietly become the wallet architecture.</p></article>
-    </div>
-  </div>
-</section><section id="trade">
-  <div class="wrap center narrow">
-    <p class="eyebrow">The honest trade</p>
-    <h2>Privacy does not erase constraints.</h2>
-    <p class="sub" style="margin-top:1rem">These are product boundaries, not footnotes.</p>
-  </div>
-  <div class="wrap">
-    <div class="truth-grid">
-      <article class="truth"><h3>Signet is a proving ground</h3><p>The public story uses signet, where coins have no value. Mainnet is not presented as release-ready by this demonstration.</p></article>
-      <article class="truth"><h3>Filters describe blocks</h3><p>Normal discovery happens at confirmation. A bounded receive-screen relay window can show an earlier observation, but “seen” is not “confirmed.”</p></article>
-      <article class="truth"><h3>Explorer visits disclose</h3><p>Opening a transaction or address at a selected explorer gives that service an IP address and the item requested. Winnow warns first and never uses Esplora as its default read path.</p></article>
-      <article class="truth"><h3>Silent receive is experimental</h3><p>Sending to a BIP352 code is self-contained. Mobile receiving needs extra per-block tweak data before filters become useful. The live story did not complete that receive-and-spend proof.</p></article>
-      <article class="truth"><h3>Filters are not consensus commitments</h3><p>Winnow compares peers and can fetch a matched full block, but a fully eclipsed phone remains a real threat. Manual peer controls let advanced users choose their own node.</p></article>
-      <article class="truth"><h3>Forward-only recovery is deliberate</h3><p>A seed alone cannot cheaply recreate Winnow's whole history. The export bundle belongs beside the recovery phrase because it records where verified forward scanning begins.</p></article>
-    </div>
-  </div>
-</section><section class="night" id="evidence">
-  <div class="wrap center narrow">
-    <p class="eyebrow">Verified on public signet</p>
-    <h2>The example left transactions behind.</h2>
-    <p class="sub" style="margin-top:1rem">Standard payments, replacement, both 2-of-3 paths, and the MuSig2 key-path spend were observed and confirmed. Silent receiving remains outside the pass set. The full worked example is at <a href="/story">the story</a>.</p>
-  </div>
-  <div class="wrap">
-    <div class="proof-grid" style="--card:var(--night-2);--rule:var(--night-rule)">
-      <article class="proof"><span class="state">Confirmed</span><h3>Customer funding</h3><p>The everyday wallet receives its first UTXO.</p><a href="https://explorer.bc-2.jp/tx/44890b72d9910a4ad9390a1f1e1ade446bde809ceb1736128274199e48e935c0">44890b72…935c0</a></article>
-      <article class="proof"><span class="state">Confirmed</span><h3>Final RBF replacement</h3><p>The higher-fee supplier payment confirms.</p><a href="https://explorer.bc-2.jp/tx/543a9cf35d1db26dc8b656d78a3b6c5fe88d23b4a4710883f521f6800814ff65">543a9cf3…ff65</a></article>
-      <article class="proof"><span class="state">Confirmed</span><h3>Cold-reserve funding</h3><p>The everyday wallet feeds the cold reserve.</p><a href="https://explorer.bc-2.jp/tx/0e860e416d346caca681f2a1b6016f9976787c363b2a4e1178bf2c07d0ebe791">0e860e41…e791</a></article>
-      <article class="proof"><span class="state">Confirmed</span><h3>Ordinary 2-of-3 path</h3><p>Two cosigners return liquidity to the everyday wallet.</p><a href="https://explorer.bc-2.jp/tx/46081b3dfb1f841bf5642737082cb88e376cc6f967fba2109ce55991aa0e698a">46081b3d…698a</a></article>
-      <article class="proof"><span class="state">Confirmed</span><h3>Recovery 2-of-3 path</h3><p>The recovery pair spends without the third cosigner.</p><a href="https://explorer.bc-2.jp/tx/7df05a8190ccfd3ae7f39e48118616cbe210561c74d41d7f23328e86e6028cbb">7df05a81…8cbb</a></article>
-      <article class="proof"><span class="state">Confirmed</span><h3>2-of-2 MuSig2 spend</h3><p>MuSig2 produces a Taproot key-path spend.</p><a href="https://explorer.bc-2.jp/tx/1b1261381ae44e1d3a0d99bfbc2bb9d428223a45f2a26642b0fcf7a17c51dc03">1b126138…dc03</a></article>
-    </div>
-    <p class="note center" style="margin-top:1.3rem"><a href="/evidence" style="color:var(--mark)">Read the sanitized evidence summary →</a></p>
-  </div>
-</section>
-<section id="get">
-  <div class="wrap">
-    <div class="cta-panel center">
-      <h2 style="font-size:clamp(1.5rem,3.4vw,2.1rem)">Bitcoin-only, mainnet-careful.</h2>
-      <p class="sub" style="margin-top:1rem;max-width:38rem;margin-inline:auto">The protocol core, both
-      multisig schemes, silent-payment sending, and import/export are complete and vector-tested. New
-      wallets default to <b>signet — Bitcoin's test network</b>, where coins have no value, while
-      mainnet gets the care it deserves.</p>
-      <div class="cta" style="justify-content:center">
-        <a class="btn" href="https://testflight.apple.com/join/83djpNE7">Join the beta on TestFlight</a>
-        <a class="btn ghost" href="/architecture">See the architecture</a>
-      </div>
+    </div></div></section><section class="alt" id="year"><div class="wrap"><p class="eyebrow">The year</p><h2>What happened, in order.</h2><div class="story-list"><article class="beat">
+        <div class="beat-media">
+          <div class="device"><div class="island"></div><div class="screen">
+            <img src="screenshots/03-receive.png" width="1320" height="2868" loading="lazy" alt="Winnow receive screen showing a fresh signet Taproot address and QR code.">
+          </div></div>
+          <p class="caption">Public signet demonstration · coins have no value</p>
+        </div>
+        <div class="beat-copy">
+          <span class="persona" style="--persona:#e59b3a">Sofía Cruz · Brisa Café</span>
+          <h3>Morning: open the till.</h3>
+          <p>The wallet and its first address are created on the phone immediately. Bitcoin headers can load in the background; Sofía does not wait for the network to write down or copy her recovery phrase.</p>
+          <p>A customer pays a fresh Taproot address. While Receive is open, Winnow watches a bounded slice of peer relay traffic for an early heads-up. The balance becomes final only when the transaction appears in a block.</p>
+          <div class="fact"><b>Why it is different:</b> creating keys is local. Knowing what confirmed is a separate network job.</div>
+        </div>
+      </article><article class="beat">
+        <div class="beat-media">
+          <div class="device"><div class="island"></div><div class="screen">
+            <img src="screenshots/06-send-review.png" width="1320" height="2868" loading="lazy" alt="Winnow transaction review showing destination, amount, fee, inputs, and change before signing.">
+          </div></div>
+          <p class="caption">The signature does not exist until the review is accepted.</p>
+        </div>
+        <div class="beat-copy">
+          <span class="persona" style="--persona:#6f5bd3">Sofía pays Lina Vega</span>
+          <h3>Noon: pay the supplier, then fix the fee.</h3>
+          <p>Winnow shows the destination, amount, fee, inputs, and change before it asks the secure key store to sign. It relays the signed transaction directly to Bitcoin peers.</p>
+          <p>If the fee is too low, Replace-by-Fee creates a higher-fee successor. The history keeps the whole replacement chain instead of pretending the first transaction vanished.</p>
+          <div class="fact"><b>Verified:</b> the public-signet story confirmed a two-step replacement chain and the final spend.</div>
+        </div>
+      </article><article class="beat">
+        <div class="beat-media">
+          <div class="policy-card" aria-label="Private reading architecture">
+            <p class="threshold">Bitcoin comes to the phone</p>
+            <div class="policy-line"><span class="key-dot" style="--key:#8a8577"></span><span><b>Block headers</b>Prove the chain's accumulated work.</span></div>
+            <div class="policy-line"><span class="key-dot" style="--key:#f7931a"></span><span><b>Compact filters</b>Summarize every block for every client.</span></div>
+            <div class="policy-line"><span class="key-dot" style="--key:#1f7a4d"></span><span><b>Local match</b>The phone decides which blocks matter.</span></div>
+          </div>
+        </div>
+        <div class="beat-copy">
+          <span class="persona" style="--persona:#f7931a">The read path</span>
+          <h3>All day: learn without asking for a balance.</h3>
+          <p>Ordinary peers send the same BIP157/158 block summaries they can send to any compact-filter client. Winnow matches those filters against Sofía's scripts on her device and downloads a full block only after a match.</p>
+          <p>No explorer or indexer receives a list of her addresses. Explorer links remain available for a person who deliberately wants a faster second opinion, but Winnow warns before opening one.</p>
+          <div class="fact"><b>The privacy boundary:</b> peers can see a network connection and requested public chain ranges. They are not sent Sofía's addresses, keys, or balance.</div>
+        </div>
+      </article><article class="beat">
+        <div class="beat-media">
+          <div class="policy-card" aria-label="Rivera two of three cold reserve">
+            <p class="threshold">Rivera reserve · any 2 of 3</p>
+            <div class="policy-line"><span class="key-dot" style="--key:#315a8a"></span><span><b>Elena Rivera</b>Family steward</span></div>
+            <div class="policy-line"><span class="key-dot" style="--key:#356fc4"></span><span><b>Leo Santos</b>Harbor Exchange custodian</span></div>
+            <div class="policy-line"><span class="key-dot" style="--key:#62896b"></span><span><b>Marina Ortiz</b>Ceiba Trust officer</span></div>
+          </div>
+        </div>
+        <div class="beat-copy">
+          <span class="persona" style="--persona:#315a8a">Brisa Café savings</span>
+          <h3>Closing time: sweep the excess cold.</h3>
+          <p>Sofía moves funds she does not need tomorrow into a Taproot 2-of-3 reserve. The script path names three independent keys, but any two can authorize a spend.</p>
+          <p>Elena and Leo return normal operating liquidity. The signers exchange PSBTs, and each device reviews the actual transaction before adding its partial signature.</p>
+          <div class="fact"><b>Verified:</b> hot-wallet funds fed the cold reserve, and an Elena + Leo spend confirmed on public signet.</div>
+        </div>
+      </article><article class="beat">
+        <div class="beat-media">
+          <div class="device"><div class="island"></div><div class="screen">
+            <img src="screenshots/15-vault-cosign.png" width="1320" height="2868" loading="lazy" alt="Winnow vault cosigning screen reviewing a partially signed Bitcoin transaction.">
+          </div></div>
+          <p class="caption">Cosigning is transaction review, not blind approval.</p>
+        </div>
+        <div class="beat-copy">
+          <span class="persona" style="--persona:#62896b">Recovery · Leo + Marina</span>
+          <h3>Years later: one person can be absent.</h3>
+          <p>If Elena cannot sign, Leo and Marina can use the same 2-of-3 policy after the family's real-world recovery checks. Bitcoin enforces the threshold; Winnow does not invent a coordinator account that can override it.</p>
+          <p>The recovery spend in the story moved funds toward Elena and Mateo's next-generation reserve without using Elena's signature.</p>
+          <div class="fact"><b>Verified:</b> the independent Leo + Marina path confirmed and credited the intended recovery output.</div>
+        </div>
+      </article><article class="beat">
+        <div class="beat-media">
+          <div class="policy-card" aria-label="Elena and Mateo MuSig2 reserve">
+            <p class="threshold">Joint reserve · both sign</p>
+            <div class="policy-line"><span class="key-dot" style="--key:#315a8a"></span><span><b>Elena Rivera</b>Nonce and signature contribution</span></div>
+            <div class="policy-line"><span class="key-dot" style="--key:#2e8b88"></span><span><b>Mateo Rivera</b>Nonce and signature contribution</span></div>
+            <div class="policy-line"><span class="key-dot" style="--key:#f7931a"></span><span><b>On chain</b>One 64-byte key-path signature</span></div>
+          </div>
+        </div>
+        <div class="beat-copy">
+          <span class="persona" style="--persona:#2e8b88">Elena + Mateo</span>
+          <h3>Two people cooperate. The chain sees one signer.</h3>
+          <p>MuSig2 lets Elena and Mateo combine public keys and signature contributions. Both must participate. Winnow keeps each secret nonce only in the active signing screen; leaving before round 2 abandons that session, and signing consumes the nonce.</p>
+          <p>The final spend uses Taproot's key path: no multisig script is revealed, and an observer sees the same witness shape as a single-key Taproot spend.</p>
+          <div class="fact"><b>Verified:</b> the public-signet transaction confirmed with one 64-byte witness item and no revealed script.</div>
+        </div>
+      </article><article class="beat">
+        <div class="beat-media">
+          <div class="device"><div class="island"></div><div class="screen">
+            <img src="screenshots/14-import-report.png" width="1320" height="2868" loading="lazy" alt="Winnow import report showing a replacement phone's verified wallet data.">
+          </div></div>
+          <p class="caption">The replacement phone verifies forward from the exported history.</p>
+        </div>
+        <div class="beat-copy">
+          <span class="persona" style="--persona:#e59b3a">Sofía's replacement phone</span>
+          <h3>A backup includes more than twelve words.</h3>
+          <p>Winnow scans forward from a wallet's creation height. Its portable export therefore carries public history and scan state alongside the material the user explicitly chooses to include.</p>
+          <p>The story imported a redacted-preview seed-bearing bundle into an isolated replacement phone, verified forward, and matched balance, UTXOs, transaction history, replacement links, scan height, and peer connectivity.</p>
+          <div class="fact"><b>Leaving is a feature:</b> the app exports the history it would otherwise have to rediscover through an expensive back-scan.</div>
+        </div>
+      </article></div></div></section>
+<section id="next">
+  <div class="wrap center">
+    <h2 style="font-size:clamp(1.4rem,3vw,1.9rem)">That was one worked example.</h2>
+    <p class="sub" style="margin-top:.9rem;max-width:34rem;margin-inline:auto">The product itself, the
+    architecture behind it, and the sanitized evidence are each their own page.</p>
+    <div class="cta" style="justify-content:center">
+      <a class="btn" href="/">Winnow</a>
+      <a class="btn ghost" href="/architecture">Architecture</a>
+      <a class="btn ghost" href="/evidence">Evidence</a>
     </div>
   </div>
 </section>
