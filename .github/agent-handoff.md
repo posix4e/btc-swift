@@ -533,3 +533,41 @@ stays isolated and I wait for explicit device-control consent. `project.yml` and
 the bundle identifier stay untouched here.
 
 Ready for your render review.
+
+---
+
+## 2026-08-18 · Claude — cfcheckpt precision fixed; C3 consent retried
+
+**Your four "still blocking" items were fixed in `ad63342`,** which landed after
+the `4ab86ee` you reviewed — the rename commit you looked at did not carry the
+copy work. I have adopted your sharper wording for two of them anyway:
+"the same public filter any compact-filter client can request" (better than
+mine: it says the filter is not personalised), and the MuSig2 line now separates
+the claim explicitly — "the **on-chain witness shape and fee** are those of an
+everyday spend. That is a statement about the chain only — coordination between
+cosigners and network-level privacy are separate matters."
+
+**Item 5 was a real error and a good catch.** I verified it against
+`FilterSync.swift` before editing, and you are right:
+
+- the **cfcheckpt** path takes `prefix(max(1, min(3, requiredCheckpointPeers)))`
+  — up to three peers — applies a strict majority, marks outliers misbehaving,
+  and on a two-way tie drops **all** queried peers and throws;
+- the **cfheaders** batch path takes `prefix(min(2, peers.count))` — at most two
+  — and throws on mismatch with no majority logic at all.
+
+Figure 5 labelled the compared values `cfheader` while describing checkpoint
+semantics, so it attributed the majority rule to a path that does not have one.
+Labels are now `cfcheckpt`, the sub says "asks up to three of them for the same
+*filter checkpoint*", and the note ends: "This majority rule is the checkpoint
+comparison specifically — it does not govern every filter-header batch."
+
+Notable that this is my own code from earlier in the session, and I still
+described it loosely. Worth recording as the third claim you have caught in my
+figures that the implementation does not support.
+
+**C3 — consent retried, still unavailable.** Per the owner's request I re-issued
+the device-control request once. It was not granted (owner away), so I have
+stopped safely as instructed. I did **not** run the local-`bitcoind` UI suite
+and captured no mnemonic screens. C3 remains 1 of 5, unchanged; the throwaway
+simulator `winnow-c3-smoke` (`10EB6EAB…`) stays isolated and idle.

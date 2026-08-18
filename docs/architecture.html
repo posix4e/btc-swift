@@ -269,7 +269,7 @@
             <div class="f1-chip"><span>filter · older</span><span>checked</span></div>
             <div class="f1-chip"><span>filter · oldest</span><span>checked</span></div>
           </div>
-          <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">a small public filter for each block</p>
+          <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">the same public filter any compact-filter client can request</p>
         </div>
         <div class="f1-col">
           <div class="f1-phone">
@@ -374,32 +374,32 @@
         </div>
       </div>
     </div>
-    <p class="takeaway">Both-of-two costs the chain <b>one signature</b>, so <b>on chain</b> the family reserve looks and costs the same as an everyday spend. The k-of-n vault is the honest opposite: it uses a script path, which is visibly multisig — a cost paid deliberately for “k of us, and nobody holds an escape hatch.”</p>
+    <p class="takeaway">Both-of-two costs the chain <b>one signature</b>, so the <b>on-chain witness shape and fee</b> are those of an everyday spend. That is a statement about the chain only — coordination between cosigners and network-level privacy are separate matters. The k-of-n vault is the honest opposite: it uses a script path, which is visibly multisig — a cost paid deliberately for “k of us, and nobody holds an escape hatch.”</p>
   </figure>
 
   <!-- ═══ FIGURE 5 ═══ -->
   <figure class="fig" id="fig-peers">
     <h2>5 · It asks several strangers the same question.</h2>
-    <p class="sub">A peer can lie by leaving your transaction out of a filter. You cannot prove which peer lied — but you can notice when they disagree. Winnow asks up to three of them the same question and compares the answers before trusting any of them.</p>
+    <p class="sub">A peer can lie by leaving your transaction out of a filter. You cannot prove which peer lied — but you can notice when they disagree. Winnow asks up to three of them for the same <em>filter checkpoint</em> and compares those answers before trusting any of them.</p>
     <div class="stage">
       <div class="f5">
         <div class="f5-peer f5-ok">
           <span class="src">peer A</span>
-          <span class="hash">cfheader 000000a3f8…e21c</span>
+          <span class="hash">cfcheckpt 000000a3f8…e21c</span>
           <span class="verdict">✓ agrees</span>
         </div>
         <div class="f5-peer f5-ok">
           <span class="src">peer B</span>
-          <span class="hash">cfheader 000000a3f8…e21c</span>
+          <span class="hash">cfcheckpt 000000a3f8…e21c</span>
           <span class="verdict">✓ agrees</span>
         </div>
         <div class="f5-peer f5-bad">
           <span class="src">peer C</span>
-          <span class="hash">cfheader 0000004b17…9d02</span>
+          <span class="hash">cfcheckpt 0000004b17…9d02</span>
           <span class="verdict">✕ dropped</span>
         </div>
       </div>
-      <p class="f5-note">A strict majority wins and the odd peer out is dropped and replaced. When two peers disagree with no majority, Winnow drops <em>all</em> of them and re-dials rather than guess which one lied.</p>
+      <p class="f5-note">Among checkpoint answers a strict majority wins, and the odd peer out is dropped and replaced. When two disagree with no majority the lie is unattributable, so Winnow drops <em>all</em> the queried peers and re-dials rather than guess. This majority rule is the checkpoint comparison specifically — it does not govern every filter-header batch.</p>
     </div>
     <p class="takeaway">Detection, not proof — and not operator independence. Peers are dialled by whichever candidates answer fastest, so nothing yet stops one operator supplying more than one slot; pinning slots by source is planned, not shipped. What ships is the comparison and the refusal to proceed on a tie — and a fully eclipsed phone can still be told one coordinated lie.</p>
   </figure>
