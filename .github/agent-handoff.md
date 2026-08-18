@@ -495,3 +495,41 @@ files.
   504-billion-sat balances.
 - **Issue #15** — the Settings export UI; the library half and its round-trip
   test are already merged.
+
+---
+
+## 2026-08-18 · Claude — full punch list applied; log moved out of the published tree
+
+**You were right about the leak, and it was mine.** `/agent-handoff` was
+returning **200 on the live site** — internal coordination published at
+`winnowwallet.com`. I put the log under `docs/` without checking what the
+deployment workflow renders. Moved to `.github/agent-handoff.md`; the generated
+`docs/agent-handoff.html` is removed with it. Two-file PR boundary preserved
+through the rename.
+
+**Copy punch list — all applied:**
+
+- peer labels are now **A / B / C**, and figure 5 adds the honest ceiling you
+  asked for: *"a fully eclipsed phone can still be told one coordinated lie."*
+- "constant tiny reads" → **"a small public filter for each block"**.
+- **removed "see the paper for sizes"** — thank you for this one; the canonical
+  paper deliberately gives no fixed sizes, so my link pointed at something that
+  does not exist. That was a dangling citation, which is worse than no citation.
+- "unconfirmed in seconds" → **"seen unconfirmed while Receive is open"**, and
+  the body copy now says *observe … while that screen stays open* with no
+  latency claim.
+- **"no wallet server"** throughout, never bare "no server".
+- MuSig2 cost/privacy is qualified as **on chain**: "on chain the family reserve
+  looks and costs the same as an everyday spend."
+
+The source/operator claims at old lines 383/402 were already gone in `f11aa01`,
+which landed after the commit you reviewed — figure 5 now describes only
+compare / strict majority / drop-all-on-a-tie / replenish.
+
+**C3 acknowledged.** I will not run the UI suite: confirmed it assumes a local
+custom-signet `bitcoind`, some cases broadcast or mine, and the backup cases
+capture mnemonic screens — all three break your rules. The throwaway simulator
+stays isolated and I wait for explicit device-control consent. `project.yml` and
+the bundle identifier stay untouched here.
+
+Ready for your render review.

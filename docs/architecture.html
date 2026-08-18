@@ -269,7 +269,7 @@
             <div class="f1-chip"><span>filter · older</span><span>checked</span></div>
             <div class="f1-chip"><span>filter · oldest</span><span>checked</span></div>
           </div>
-          <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">a small, steady trickle — see <a href="/paper" style="color:var(--mark)">the paper</a> for sizes</p>
+          <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">a small public filter for each block</p>
         </div>
         <div class="f1-col">
           <div class="f1-phone">
@@ -288,7 +288,7 @@
         </div>
       </div>
     </div>
-    <p class="takeaway">The asymmetry is the design. A small read for every block, a big one only on a match, and <b>no query that names an address</b> — so there is nothing for a server to log, because there is no server.</p>
+    <p class="takeaway">The asymmetry is the design. A small public filter for each block, a whole block only on a match, and <b>no query that names an address</b> — so there is nothing for a wallet server to log, because there is no wallet server.</p>
   </figure>
 
   <!-- ═══ FIGURE 2 ═══ -->
@@ -309,7 +309,7 @@
           <div class="f2-dot" style="left:52%;top:28px;animation-delay:-1.6s"></div>
           <div class="f2-dot" style="left:64%;top:44px;animation-delay:-2.1s"></div>
           <div class="f2-dot" style="left:78%;top:30px;animation-delay:-2.7s"></div>
-          <div class="f2-mine" style="left:44%;top:60px"><b>yours — unconfirmed in seconds</b></div>
+          <div class="f2-mine" style="left:44%;top:60px"><b>yours — seen unconfirmed while Receive is open</b></div>
         </div>
       </div>
       <div class="f2-legend">
@@ -347,7 +347,7 @@
   <!-- ═══ FIGURE 4 ═══ -->
   <figure class="fig" id="fig-musig">
     <h2>4 · Two signatures that look like one.</h2>
-    <p class="sub">Elena and Mateo hold the family reserve together — a 2-of-2 MuSig2 vault, coordinated over PSBTs with no server in the middle. Two rounds, public nonces then partial signatures, collapse into a single Schnorr signature.</p>
+    <p class="sub">Elena and Mateo hold the family reserve together — a 2-of-2 MuSig2 vault, coordinated over PSBTs with no wallet server in the middle. Two rounds, public nonces then partial signatures, collapse into a single Schnorr signature.</p>
     <div class="stage">
       <div class="f4">
         <div class="f4-stage">
@@ -374,7 +374,7 @@
         </div>
       </div>
     </div>
-    <p class="takeaway">Both-of-two costs the chain <b>one signature</b>, so the family reserve is as cheap and as private as an everyday spend. The k-of-n vault is the honest opposite: it uses a script path, which is visibly multisig — a cost paid deliberately for “k of us, and nobody holds an escape hatch.”</p>
+    <p class="takeaway">Both-of-two costs the chain <b>one signature</b>, so <b>on chain</b> the family reserve looks and costs the same as an everyday spend. The k-of-n vault is the honest opposite: it uses a script path, which is visibly multisig — a cost paid deliberately for “k of us, and nobody holds an escape hatch.”</p>
   </figure>
 
   <!-- ═══ FIGURE 5 ═══ -->
@@ -384,24 +384,24 @@
     <div class="stage">
       <div class="f5">
         <div class="f5-peer f5-ok">
-          <span class="src">peer 1</span>
+          <span class="src">peer A</span>
           <span class="hash">cfheader 000000a3f8…e21c</span>
           <span class="verdict">✓ agrees</span>
         </div>
         <div class="f5-peer f5-ok">
-          <span class="src">peer 2</span>
+          <span class="src">peer B</span>
           <span class="hash">cfheader 000000a3f8…e21c</span>
           <span class="verdict">✓ agrees</span>
         </div>
         <div class="f5-peer f5-bad">
-          <span class="src">peer 3</span>
+          <span class="src">peer C</span>
           <span class="hash">cfheader 0000004b17…9d02</span>
           <span class="verdict">✕ dropped</span>
         </div>
       </div>
       <p class="f5-note">A strict majority wins and the odd peer out is dropped and replaced. When two peers disagree with no majority, Winnow drops <em>all</em> of them and re-dials rather than guess which one lied.</p>
     </div>
-    <p class="takeaway">Detection, not proof — and not operator independence. Peers are dialled by whichever candidates answer fastest, so nothing yet stops one operator supplying more than one slot; pinning slots by source is planned, not shipped. What ships is the comparison, and the refusal to proceed on a tie.</p>
+    <p class="takeaway">Detection, not proof — and not operator independence. Peers are dialled by whichever candidates answer fastest, so nothing yet stops one operator supplying more than one slot; pinning slots by source is planned, not shipped. What ships is the comparison and the refusal to proceed on a tie — and a fully eclipsed phone can still be told one coordinated lie.</p>
   </figure>
 
 </div>
