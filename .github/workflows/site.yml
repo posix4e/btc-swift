@@ -1,20 +1,33 @@
 name: Site
 
-# Deploys docs/ to Cloudflare Pages on every push to main.
+# Deploys docs/ to Cloudflare Pages for website pull requests and pushes to main.
 # Requires repo secrets: CF_API_TOKEN (Account → Cloudflare Pages: Edit),
 # CF_ACCOUNT_ID. Project name: winnow. Custom domain: winnowwallet.com.
 on:
   workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths: ["docs/**", ".github/workflows/site.yml"]
   push:
     branches: [main]
     paths: ["docs/**", ".github/workflows/site.yml"]
 
 permissions:
   contents: read
+  deployments: write
+  pull-requests: write
+
+concurrency:
+  group: pages-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'production' }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
+    name: ${{ github.event_name == 'pull_request' && 'Deploy website preview' || 'Deploy website' }}
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    env:
+      CF_PAGES_BRANCH: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'main' }}
     steps:
       - uses: actions/checkout@v4
       - name: Render markdown pages to HTML (pandoc)
@@ -23,8 +36,39 @@ jobs:
           cd docs
           for f in *.md; do pandoc "$f" -s --template=_template.html -o "${f%.md}.html"; done
       - name: Deploy docs/ to Cloudflare Pages
+        id: deploy
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy docs --project-name=winnow --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: pages deploy docs --project-name=winnow --branch=${{ env.CF_PAGES_BRANCH }}
+      - name: Add preview link to the pull request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v9
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+        with:
+          script: |
+            const marker = '<!-- winnow-pages-preview -->';
+            const body = `${marker}\nWebsite preview: ${process.env.PREVIEW_URL}`;
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              { ...context.repo, issue_number: context.issue.number }
+            );
+            const existing = comments.find(
+              (comment) => comment.user?.type === 'Bot' && comment.body?.includes(marker)
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                ...context.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: context.issue.number,
+                body
+              });
+            }
