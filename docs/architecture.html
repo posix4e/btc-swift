@@ -263,11 +263,11 @@
         <div class="f1-col">
           <p class="lbl" style="margin-bottom:.5rem">Every block · always</p>
           <div class="f1-track">
-            <div class="f1-chip"><span>filter · block n</span><span>checked</span></div>
-            <div class="f1-chip"><span>filter · block n−1</span><span>checked</span></div>
-            <div class="f1-chip"><span>filter · block n−2</span><span>checked</span></div>
-            <div class="f1-chip"><span>filter · block n−3</span><span>checked</span></div>
-            <div class="f1-chip"><span>filter · block n−4</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter · newest</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter · newer</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter · older</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter · older</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter · oldest</span><span>checked</span></div>
           </div>
           <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">a small, steady trickle — see <a href="/paper" style="color:var(--mark)">the paper</a> for sizes</p>
         </div>
@@ -288,7 +288,7 @@
         </div>
       </div>
     </div>
-    <p class="takeaway">The asymmetry is the design. Constant tiny reads, rare big ones, and <b>no query that names an address</b> — so there is nothing for a server to log, because there is no server.</p>
+    <p class="takeaway">The asymmetry is the design. A small read for every block, a big one only on a match, and <b>no query that names an address</b> — so there is nothing for a server to log, because there is no server.</p>
   </figure>
 
   <!-- ═══ FIGURE 2 ═══ -->
@@ -380,28 +380,28 @@
   <!-- ═══ FIGURE 5 ═══ -->
   <figure class="fig" id="fig-peers">
     <h2>5 · It asks several strangers the same question.</h2>
-    <p class="sub">A peer can lie by leaving your transaction out of a filter. You cannot prove which peer lied — but you can notice that they disagree, provided they aren't all the same operator. Winnow fills its peer slots from <em>different sources</em> and compares.</p>
+    <p class="sub">A peer can lie by leaving your transaction out of a filter. You cannot prove which peer lied — but you can notice when they disagree. Winnow asks up to three of them the same question and compares the answers before trusting any of them.</p>
     <div class="stage">
       <div class="f5">
         <div class="f5-peer f5-ok">
-          <span class="src">hardcoded</span>
+          <span class="src">peer 1</span>
           <span class="hash">cfheader 000000a3f8…e21c</span>
           <span class="verdict">✓ agrees</span>
         </div>
         <div class="f5-peer f5-ok">
-          <span class="src">dns seed</span>
+          <span class="src">peer 2</span>
           <span class="hash">cfheader 000000a3f8…e21c</span>
           <span class="verdict">✓ agrees</span>
         </div>
         <div class="f5-peer f5-bad">
-          <span class="src">persisted</span>
+          <span class="src">peer 3</span>
           <span class="hash">cfheader 0000004b17…9d02</span>
           <span class="verdict">✕ dropped</span>
         </div>
       </div>
-      <p class="f5-note">The disagreeing peer is disconnected and re-dialed from a different source class, so one operator cannot quietly hold every slot.</p>
+      <p class="f5-note">A strict majority wins and the odd peer out is dropped and replaced. When two peers disagree with no majority, Winnow drops <em>all</em> of them and re-dials rather than guess which one lied.</p>
     </div>
-    <p class="takeaway">Detection, not proof. That is the honest ceiling for a light client — and why the filter headers are pinned and re-checked rather than <b>taken on the word of whoever answered first</b>.</p>
+    <p class="takeaway">Detection, not proof — and not operator independence. Peers are dialled by whichever candidates answer fastest, so nothing yet stops one operator supplying more than one slot; pinning slots by source is planned, not shipped. What ships is the comparison, and the refusal to proceed on a tie.</p>
   </figure>
 
 </div>
