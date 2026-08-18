@@ -86,10 +86,8 @@ Two-of-two cannot survive one missing key. A professional 2-of-3 can
 survive one missing key, but it also allows two institutions to act
 without the owner. Jurisdiction, contracts, privacy, fees, operational
 competence, and counterparty risk remain part of custody.</p>
-<p>This paper explains the design through fictional people and
-institutions: Sofía Cruz and Brisa Café; Elena and Mateo Rivera; Harbor
-Exchange; and Ceiba Trust. Public transaction evidence comes from
-Bitcoin signet, where coins have no monetary value.</p>
+<p>This paper defines the model directly. Public transaction evidence
+comes from Bitcoin signet, where coins have no monetary value.</p>
 <p>Four status words are used deliberately:</p>
 <table>
 <colgroup>
@@ -109,8 +107,8 @@ Bitcoin signet, where coins have no monetary value.</p>
 </tr>
 <tr>
 <td><strong>Verified on signet</strong></td>
-<td>Exercised in the reproducible public-signet story and backed by
-public transaction evidence.</td>
+<td>Exercised in the reproducible public-signet run and backed by public
+transaction evidence.</td>
 </tr>
 <tr>
 <td><strong>Experimental</strong></td>
@@ -132,11 +130,11 @@ policy a person will operate well.</p>
 <h3 id="one-personal">1.1 One · Personal</h3>
 <p><strong>Implemented; daily payments and RBF verified on
 signet.</strong></p>
-<p>Sofía receives customer payments and pays suppliers from one BIP86
-hot wallet on her phone. This level is fast, understandable, and
-appropriate for modest balances and everyday liquidity. Its principal
-failure mode is equally plain: one compromised or irrecoverably lost key
-can lose the funds.</p>
+<p>A personal BIP86 hot wallet receives and sends daily payments from
+the phone. This level is fast, understandable, and appropriate for
+modest balances and everyday liquidity. Its principal failure mode is
+equally plain: one compromised or irrecoverably lost key can lose the
+funds.</p>
 <p>The wallet is created locally. Its recovery phrase can be copied
 during onboarding or later from Settings after device authentication.
 Creation and backup do not wait for header synchronization. Chain
@@ -183,15 +181,14 @@ stewarded</h3>
 and two signing paths are verified on signet. Provider onboarding and
 institutional accounts are tracked in <a
 href="https://github.com/posix4e/winnow/issues/53">issue 53</a>.</p>
-<p>The Rivera cold reserve assigns three distinct roles:</p>
+<p>The professional custody template assigns three distinct roles:</p>
 <ul>
-<li><strong>Owner — Elena Rivera:</strong> keeps a key in Winnow or a
-compatible external wallet.</li>
-<li><strong>Exchange/lender — Leo Santos at fictional Harbor
-Exchange:</strong> supports temporary liquidity and operational
-recovery.</li>
-<li><strong>Trust/fiduciary — Marina Ortiz at fictional Ceiba
-Trust:</strong> supports succession and legal continuity.</li>
+<li><strong>Owner:</strong> keeps a key in Winnow or a compatible
+external wallet.</li>
+<li><strong>Exchange/lender:</strong> supports temporary liquidity and
+operational recovery.</li>
+<li><strong>Trust/fiduciary:</strong> supports succession and legal
+continuity.</li>
 </ul>
 <p>Any two keys satisfy the Bitcoin policy:</p>
 <table>
@@ -245,7 +242,7 @@ implementation failure domain. Three institutional signers in one
 jurisdiction can have a common legal failure domain. The interface
 should expose these relationships rather than reduce safety to “number
 of keys.”</p>
-<p>The 1–2–3 ladder also separates purposes. Sofía’s café wallet
+<p>The 1–2–3 ladder also separates purposes. A personal hot wallet
 optimizes for liquidity. A mixed-wallet 2-of-2 optimizes for compromise
 containment. The owner–exchange–trust 2-of-3 optimizes for financial and
 legal continuity.</p>
@@ -426,7 +423,7 @@ signing.</li>
 always-on mempool service. Its spends signal Replace-by-Fee. A fee bump
 spends the same inputs at a higher fee, and history retains the
 original, intermediate replacements, and final confirmed transaction.
-The Brisa Café signet story verified a two-step replacement chain.</p>
+The public-signet run verified a two-step replacement chain.</p>
 <h3 id="coming-soon-planned-submission-routes">6.1 Coming soon: planned
 submission routes</h3>
 <p>Signing and submission are separate decisions. Winnow’s planned modes
@@ -481,9 +478,9 @@ exchange public nonces, create partial signatures, and aggregate one
 Schnorr signature. Secret nonce reuse can reveal a signing key, so
 Winnow keeps nonce material only in the active session, consumes it
 during round two, and abandons it if interrupted.</p>
-<p>Elena and Mateo’s verified signet spend used Winnow-controlled story
-roles. Its witness contained one 64-byte signature and revealed no
-script. It proves the Winnow MuSig2 implementation; it does
+<p>The verified two-party signet spend used Winnow-controlled
+participants. Its witness contained one 64-byte signature and revealed
+no script. It proves the Winnow MuSig2 implementation; it does
 <strong>not</strong> prove descriptor, PSBT, transport, or review
 compatibility with another Bitcoin wallet or hardware device.</p>
 <p>The planned two-wallet ceremony must generate two independent seeds,
@@ -493,19 +490,19 @@ provide a rotation path. Coldcard NFC and microSD are initial research
 targets rather than implied support.</p>
 <h3 id="ownerexchangetrust-threshold">7.2 Owner–exchange–trust
 threshold</h3>
-<p>The Rivera cold reserve uses a NUMS internal key and Taproot script
-leaf with a threshold multisignature policy. Funds cannot be spent
-through an unknown key path. A valid spend reveals the selected script,
-control block, and required signatures.</p>
+<p>The 2-of-3 reserve uses a NUMS internal key and Taproot script leaf
+with a threshold multisignature policy. Funds cannot be spent through an
+unknown key path. A valid spend reveals the selected script, control
+block, and required signatures.</p>
 <p>PSBTv2 carries the unsigned transaction and metadata cosigners need.
 Each participant reviews before contributing a signature. A provider
 integration must add a versioned signer package, public-key validation,
 safe transport, policy display, status, and an exit procedure without
 turning the coordinator into a hidden authorization service.</p>
-<p>The public-signet story completed Elena + Leo and Leo + Marina. This
-proves two generic signing paths. It does not prove loan servicing,
-identity checks, inheritance adjudication, or an account at a real
-institution.</p>
+<p>The public-signet run completed owner + lender and lender + trust
+paths. This proves two generic signing paths. It does not prove loan
+servicing, identity checks, inheritance adjudication, or an account at a
+real institution.</p>
 <h3 id="market-evidence-is-not-an-endorsement">7.3 Market evidence is
 not an endorsement</h3>
 <p>Existing firms show that pieces of this model have market demand,
@@ -534,7 +531,7 @@ requires an explicit authenticated choice and keeps the preview
 redacted. The phrase remains copyable after authentication because
 recovery material must fit the owner’s chosen backup process.</p>
 <p>On import, the replacement phone validates the bundle, reconstructs
-wallet state, and verifies forward. The public-signet story matched
+wallet state, and verifies forward. The public-signet run matched
 balance, UTXO count, history, replacement links, scan height, and peer
 connectivity.</p>
 <p>Public automation excludes mnemonics, entropy, private keys, secret
@@ -560,16 +557,16 @@ candidates locally, and treats Winnow’s existing filter/full-block path
 as authoritative for positive matches.</p>
 <p>A provider sees an IP address and broad requested ranges and can omit
 data. Receive therefore remains off by default and experimental. The
-current story did not complete Silent Payment receive, export/import,
-and spend; that is an unmet acceptance criterion tracked in <a
+current run did not complete Silent Payment receive, export/import, and
+spend; that is an unmet acceptance criterion tracked in <a
 href="https://github.com/posix4e/winnow/issues/40">issue 40</a>.</p>
 <h2 id="reproducible-evidence">10. Reproducible evidence</h2>
 <p>The checked-in <code>winnow-story</code> command creates an isolated
-simulator run, records scenario and tool versions, launches named roles,
-preserves protected state for resume, monitors public signet, and emits
-a safe event journal. It does not require Bitcoin Core, RPC credentials,
-or an owner-machine daemon.</p>
-<p>The August 2026 story verified these confirmed transactions:</p>
+simulator run, records scenario and tool versions, launches isolated
+roles, preserves protected state for resume, monitors public signet, and
+emits a safe event journal. It does not require Bitcoin Core, RPC
+credentials, or an owner-machine daemon.</p>
+<p>The August 2026 run verified these confirmed transactions:</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -578,50 +575,50 @@ or an owner-machine daemon.</p>
 </colgroup>
 <thead>
 <tr>
-<th>Story event</th>
+<th>Verification event</th>
 <th>Public signet transaction</th>
 <th>Result</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>First customer payment</td>
+<td>Hot-wallet funding</td>
 <td><a
 href="https://explorer.bc-2.jp/tx/44890b72d9910a4ad9390a1f1e1ade446bde809ceb1736128274199e48e935c0"><code>44890b72…935c0</code></a></td>
 <td>Hot wallet credited</td>
 </tr>
 <tr>
-<td>Final supplier RBF</td>
+<td>Final payment RBF</td>
 <td><a
 href="https://explorer.bc-2.jp/tx/543a9cf35d1db26dc8b656d78a3b6c5fe88d23b4a4710883f521f6800814ff65"><code>543a9cf3…ff65</code></a></td>
 <td>Replacement confirmed</td>
 </tr>
 <tr>
-<td>Cold-reserve funding</td>
+<td>2-of-3 reserve funding</td>
 <td><a
 href="https://explorer.bc-2.jp/tx/0e860e416d346caca681f2a1b6016f9976787c363b2a4e1178bf2c07d0ebe791"><code>0e860e41…e791</code></a></td>
 <td>Hot wallet fed 2-of-3 reserve</td>
 </tr>
 <tr>
-<td>Elena + Leo</td>
+<td>Owner + lender</td>
 <td><a
 href="https://explorer.bc-2.jp/tx/46081b3dfb1f841bf5642737082cb88e376cc6f967fba2109ce55991aa0e698a"><code>46081b3d…698a</code></a></td>
 <td>Ordinary path confirmed</td>
 </tr>
 <tr>
-<td>Leo + Marina</td>
+<td>Lender + trust</td>
 <td><a
 href="https://explorer.bc-2.jp/tx/7df05a8190ccfd3ae7f39e48118616cbe210561c74d41d7f23328e86e6028cbb"><code>7df05a81…8cbb</code></a></td>
 <td>Recovery path confirmed</td>
 </tr>
 <tr>
-<td>Joint-reserve funding</td>
+<td>MuSig2 reserve funding</td>
 <td><a
 href="https://explorer.bc-2.jp/tx/995bedd34e108a9d640ebb0c005cb1519e156059086c7349918a4e1198b4761c"><code>995bedd3…761c</code></a></td>
 <td>MuSig2 reserve funded</td>
 </tr>
 <tr>
-<td>Elena + Mateo</td>
+<td>Two-party MuSig2</td>
 <td><a
 href="https://explorer.bc-2.jp/tx/1b1261381ae44e1d3a0d99bfbc2bb9d428223a45f2a26642b0fcf7a17c51dc03"><code>1b126138…dc03</code></a></td>
 <td>Key-path spend confirmed</td>
@@ -684,8 +681,8 @@ referral disclosure, ranking, and click privacy</a>.</li>
 modes and durable receipts</a>.</li>
 <li><a href="https://github.com/posix4e/winnow/issues/59">Build the MARA
 Slipstream direct-miner pilot</a>.</li>
-<li><a href="https://github.com/posix4e/winnow/issues/56">Extend the
-reproducible story</a>.</li>
+<li><a href="https://github.com/posix4e/winnow/issues/56">Extend
+reproducible end-to-end coverage</a>.</li>
 </ol>
 <p>No provider marketplace ships until the directory and referral
 decisions are recorded. P2P remains the default. New signet evidence

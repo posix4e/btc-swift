@@ -4,16 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Winnow — one wallet, two signers, three roles</title>
-<meta name="description" content="A 15-minute story about Winnow's custody ladder, private Bitcoin discovery, recovery, and planned professional services.">
+<meta name="description" content="A 15-minute presentation about Winnow's custody ladder, private Bitcoin discovery, recovery, and planned professional services.">
 <link rel="canonical" href="https://winnowwallet.com/present">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://winnowwallet.com/present">
 <meta property="og:title" content="Winnow — one wallet, two signers, three roles">
-<meta property="og:description" content="A 15-minute story about personal liquidity, independent signers, and professionally stewarded Bitcoin.">
+<meta property="og:description" content="A 15-minute explanation of personal liquidity, independent signers, and professionally stewarded Bitcoin.">
 <meta property="og:image" content="https://winnowwallet.com/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Winnow — one wallet, two signers, three roles">
-<meta name="twitter:description" content="A 15-minute story about personal liquidity, independent signers, and professionally stewarded Bitcoin.">
+<meta name="twitter:description" content="A 15-minute explanation of personal liquidity, independent signers, and professionally stewarded Bitcoin.">
 <meta name="twitter:image" content="https://winnowwallet.com/og.png">
 <style>
 :root{
@@ -94,8 +94,8 @@ body.presenting .topbar{display:none}body.presenting .scene{display:none;border:
       <div>
         <p class="kicker">Winnow · Puerto Rico · 15 minutes</p>
         <h1>One wallet.<br><span class="soft">Two signers. Three roles.</span></h1>
-        <p class="lead">Sofía starts with the smallest policy that fits the money, then adds independent failure domains as her café and family needs grow.</p>
-        <p class="fiction">Sofía Cruz, Brisa Café, Harbor Exchange, Ceiba Trust, and the Rivera family are fictional. The linked signet transactions are real test evidence.</p>
+        <p class="lead">Use the smallest policy that fits the money: personal liquidity, independent signing, or professionally stewarded continuity.</p>
+        <p class="fiction">Implemented behavior and verified signet evidence are separated from coming-soon integrations.</p>
       </div>
       <div class="visual ladder" role="group" aria-label="Winnow custody ladder">
         <div class="level" style="--tone:var(--amber)"><small>1 · personal · implemented</small><strong>One hot-wallet key</strong><span>Simple daily liquidity; one-key loss or compromise risk.</span></div>
@@ -110,7 +110,7 @@ body.presenting .topbar{display:none}body.presenting .scene{display:none;border:
       <div>
         <p class="kicker">01 · personal · implemented</p>
         <h2>Open first.<br><span class="soft">Synchronize behind it.</span></h2>
-        <p class="lead">Sofía creates Brisa Café's key, copies her recovery phrase, and receives without waiting for historical headers. This is the right-sized wallet for daily payments and modest balances.</p>
+        <p class="lead">Create a hot-wallet key, copy the recovery phrase, and receive without waiting for historical headers. This is the right-sized wallet for daily payments and modest balances.</p>
         <details><summary>For Q&amp;A: what happens at payment time?</summary><p>The Receive screen watches a bounded relay window for an early observation. Confirmation still comes from a block. Spending shows destination, amount, fee, inputs, and change before signing; spends opt into RBF.</p></details>
       </div>
       <div class="visual phone"><img src="screenshots/03-receive.png" width="1320" height="2868" alt="Winnow receive screen with a fresh signet Taproot address."></div>
@@ -122,13 +122,13 @@ body.presenting .topbar{display:none}body.presenting .scene{display:none;border:
       <div>
         <p class="kicker">02 · the read path · implemented</p>
         <h2>Bring Bitcoin<br><span class="soft">to the phone.</span></h2>
-        <p class="lead">Peers serve public headers and compact block filters. Sofía's phone checks those summaries against her scripts locally. It never asks a wallet server for her balance.</p>
+        <p class="lead">Peers serve public headers and compact block filters. The phone checks those summaries against wallet scripts locally. It never asks a wallet server for a balance.</p>
         <details><summary>For Q&amp;A: what does a peer still learn?</summary><p>A peer sees a connection and public chain ranges. A matched full-block request can add a correlation clue, so Winnow can separate peers. A full eclipse remains a real threat; this is a light client, not a validating full node.</p></details>
       </div>
       <div class="visual network" role="group" aria-label="Three Bitcoin peers send public filters to a phone that matches privately">
         <div class="nodes"><div class="node"><b>Peer A</b><span>headers</span></div><div class="node"><b>Peer B</b><span>filter headers</span></div><div class="node"><b>Peer C</b><span>compact filters</span></div></div>
         <div class="stream" aria-hidden="true"></div>
-        <div class="device-box"><b>Sofía's phone</b><span>matches wallet scripts here</span><div class="zero">addresses sent: 0</div></div>
+        <div class="device-box"><b>Winnow on iPhone</b><span>matches wallet scripts here</span><div class="zero">addresses sent: 0</div></div>
       </div>
     </div>
   </section>
@@ -154,12 +154,12 @@ body.presenting .topbar{display:none}body.presenting .scene{display:none;border:
       <div>
         <p class="kicker">04 · match policy to purpose</p>
         <h2>Tomorrow's cash stays hot.<br><span class="soft">Long-term funds gain continuity.</span></h2>
-        <p class="lead">One owner can use more than one custody level. Sofía keeps operating money in Brisa Café and moves excess funds into a 2-of-3 reserve instead of leaving everything behind one phone key.</p>
+        <p class="lead">One owner can use more than one custody level. Keep operating money in a personal hot wallet and move long-term funds into a 2-of-3 reserve instead of leaving everything behind one phone key.</p>
       </div>
       <div class="visual ladder">
-        <div class="level" style="--tone:var(--amber)"><small>1 · daily</small><strong>Brisa Café hot wallet</strong><span>Fast, simple liquidity.</span></div>
+        <div class="level" style="--tone:var(--amber)"><small>1 · daily</small><strong>Personal hot wallet</strong><span>Fast, simple liquidity.</span></div>
         <div style="text-align:center;color:var(--orange);font-size:2rem" aria-hidden="true">↓</div>
-        <div class="level" style="--tone:var(--blue)"><small>3 · continuity</small><strong>Rivera 2-of-3 reserve</strong><span>Owner · exchange/lender · trust.</span></div>
+        <div class="level" style="--tone:var(--blue)"><small>3 · continuity</small><strong>Professional 2-of-3 reserve</strong><span>Owner · exchange/lender · trust.</span></div>
       </div>
     </div>
   </section>
@@ -173,10 +173,10 @@ body.presenting .topbar{display:none}body.presenting .scene{display:none;border:
         <details><summary>For Q&amp;A: what is still planned?</summary><p>Winnow can construct and spend the generic 2-of-3 policy today, and two paths were verified on signet. Safe provider packages, account handoffs, a directory, referrals, and production institution integrations do not exist yet.</p></details>
       </div>
       <div class="visual policy">
-        <div class="policy-title">Rivera reserve · 2 of 3</div>
-        <div class="person"><i class="dot" style="--tone:var(--blue)"></i><div><b>Elena Rivera</b><span>owner and family steward</span></div><em class="yes">key A</em></div>
-        <div class="person"><i class="dot" style="--tone:var(--cobalt)"></i><div><b>Leo Santos</b><span>fictional Harbor Exchange / lender</span></div><em class="yes">key B</em></div>
-        <div class="person"><i class="dot" style="--tone:var(--sage)"></i><div><b>Marina Ortiz</b><span>fictional Ceiba Trust / fiduciary</span></div><em class="yes">key C</em></div>
+        <div class="policy-title">Professional custody · 2 of 3</div>
+        <div class="person"><i class="dot" style="--tone:var(--blue)"></i><div><b>Owner</b><span>personal control</span></div><em class="yes">key A</em></div>
+        <div class="person"><i class="dot" style="--tone:var(--cobalt)"></i><div><b>Exchange or lender</b><span>liquidity and operations</span></div><em class="yes">key B</em></div>
+        <div class="person"><i class="dot" style="--tone:var(--sage)"></i><div><b>Trust or fiduciary</b><span>succession and continuity</span></div><em class="yes">key C</em></div>
       </div>
     </div>
   </section>
@@ -225,7 +225,7 @@ body.presenting .topbar{display:none}body.presenting .scene{display:none;border:
       <div class="visual status-grid">
         <div class="status" style="--tone:#1f7a4d"><b>Verified on signet</b><p>Replacement phone matched balance, UTXOs, history, RBF links, and scan height.</p></div>
         <div class="status" style="--tone:var(--orange)"><b>Implemented</b><p>Silent Payment send creates the recipient-specific Taproot output locally.</p></div>
-        <div class="status" style="--tone:#b14343"><b>Experimental</b><p>Silent Payment receive-and-spend did not complete in the current public story.</p></div>
+        <div class="status" style="--tone:#b14343"><b>Experimental</b><p>Silent Payment receive-and-spend did not complete in the current public-signet run.</p></div>
       </div>
     </div>
   </section>
@@ -239,7 +239,7 @@ body.presenting .topbar{display:none}body.presenting .scene{display:none;border:
         <div class="final-actions"><a class="cta primary" href="https://testflight.apple.com/join/83djpNE7">Join TestFlight</a><a class="cta" href="https://github.com/posix4e/winnow">Read the source</a><a class="cta" href="https://github.com/posix4e/winnow/issues/60">Follow the roadmap</a><a class="cta" href="/paper">Read the paper</a></div>
         <p class="fiction">winnowwallet.com/present</p>
       </div>
-      <div class="visual qr"><img src="present-qr.png" width="248" height="248" alt="QR code for winnowwallet.com/present"><span>Take the story with you</span></div>
+      <div class="visual qr"><img src="present-qr.png" width="248" height="248" alt="QR code for winnowwallet.com/present"><span>Open the presentation</span></div>
     </div>
   </section>
 </main>
