@@ -393,40 +393,6 @@
 
       <article class="beat">
         <div class="beat-media">
-          <div class="device"><div class="island"></div><div class="screen">
-            <img src="screenshots/06-send-review.png" width="1320" height="2868" loading="lazy" alt="Winnow transaction review showing destination, amount, fee, inputs, and change before signing.">
-          </div></div>
-          <p class="caption">The signature does not exist until the review is accepted.</p>
-        </div>
-        <div class="beat-copy">
-          <span class="persona" style="--persona:#6f5bd3">Payments · verified on signet</span>
-          <h3>Review, relay, and replace.</h3>
-          <p>Winnow shows the destination, amount, fee, inputs, and change before it asks the secure key store to sign. It relays the signed transaction directly to Bitcoin peers.</p>
-          <p>If the fee is too low, Replace-by-Fee creates a higher-fee successor. The history keeps the whole replacement chain instead of pretending the first transaction vanished.</p>
-          <div class="fact"><b>Verified:</b> the public-signet run confirmed a two-step replacement chain and the final spend.</div>
-        </div>
-      </article>
-
-      <article class="beat">
-        <div class="beat-media">
-          <div class="policy-card" role="group" aria-label="Private reading architecture">
-            <p class="threshold">Bitcoin comes to the phone</p>
-            <div class="policy-line"><span class="key-dot" style="--key:#8a8577"></span><span><b>Block headers</b>Prove the chain's accumulated work.</span></div>
-            <div class="policy-line"><span class="key-dot" style="--key:#f7931a"></span><span><b>Compact filters</b>Summarize every block for every client.</span></div>
-            <div class="policy-line"><span class="key-dot" style="--key:#1f7a4d"></span><span><b>Local match</b>The phone decides which blocks matter.</span></div>
-          </div>
-        </div>
-        <div class="beat-copy">
-          <span class="persona" style="--persona:#f7931a">The read path</span>
-          <h3>All day: learn without asking for a balance.</h3>
-          <p>Ordinary peers send the same BIP157/158 block summaries they can send to any compact-filter client. Winnow matches those filters against wallet scripts on the device and downloads a full block only after a match.</p>
-          <p>No explorer or indexer receives a list of wallet addresses. Explorer links remain available for a person who deliberately wants a faster second opinion, but Winnow warns before opening one.</p>
-          <div class="fact"><b>The privacy boundary:</b> peers can see a network connection and requested public chain ranges. They are not sent addresses, keys, or a balance query.</div>
-        </div>
-      </article>
-
-      <article class="beat">
-        <div class="beat-media">
           <div class="policy-card" role="group" aria-label="Owner, lender, and trust two-of-three policy">
           <p class="threshold">Professional custody · any 2 of 3</p>
             <div class="policy-line"><span class="key-dot" style="--key:#315a8a"></span><span><b>Owner</b>Personal control</span></div>
