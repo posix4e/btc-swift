@@ -257,19 +257,19 @@
   <!-- ═══ FIGURE 1 ═══ -->
   <figure class="fig" id="fig-filters">
     <h2>1 · It reads summaries, not the chain.</h2>
-    <p class="sub">Every block gets a compact filter — a few kilobytes that answer “might this block touch one of your scripts?” Winnow checks that <em>on the phone</em>. Only a hit costs a full block download, and nobody is ever told which scripts it asked about.</p>
+    <p class="sub">Every block gets a compact filter — a small summary that answers “might this block touch one of your scripts?” Winnow checks that <em>on the phone</em>. Only a hit costs a full block download, and nobody is ever told which scripts it asked about.</p>
     <div class="stage">
       <div class="f1">
         <div class="f1-col">
           <p class="lbl" style="margin-bottom:.5rem">Every block · always</p>
           <div class="f1-track">
-            <div class="f1-chip"><span>filter 902,146</span><span>18 KB</span></div>
-            <div class="f1-chip"><span>filter 902,145</span><span>17 KB</span></div>
-            <div class="f1-chip"><span>filter 902,144</span><span>19 KB</span></div>
-            <div class="f1-chip"><span>filter 902,143</span><span>16 KB</span></div>
-            <div class="f1-chip"><span>filter 902,142</span><span>18 KB</span></div>
+            <div class="f1-chip"><span>filter 902,146</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter 902,145</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter 902,144</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter 902,143</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter 902,142</span><span>checked</span></div>
           </div>
-          <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">≈3 MB/day, steady state</p>
+          <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">a small, steady trickle — see <a href="/paper" style="color:var(--mark)">the paper</a> for sizes</p>
         </div>
         <div class="f1-col">
           <div class="f1-phone">
@@ -281,10 +281,10 @@
         <div class="f1-col">
           <p class="lbl" style="margin-bottom:.5rem">On a hit only · rare</p>
           <div class="f1-block">
-            <span class="big">1.4 MB</span>
+            <span class="big">a whole block</span>
             <span class="lbl">full block 902,144</span>
           </div>
-          <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">days or weeks apart</p>
+          <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">only when a filter matches</p>
         </div>
       </div>
     </div>
@@ -313,11 +313,11 @@
         </div>
       </div>
       <div class="f2-legend">
-        <span><i style="background:rgba(168,162,148,.6)"></i>everyone's relay traffic — fetched wholesale, so you look like a full node</span>
+        <span><i style="background:rgba(168,162,148,.6)"></i>everyone's relay traffic — asked for wholesale, never per address</span>
         <span><i style="background:var(--mark)"></i>your payment, spotted on the device</span>
       </div>
     </div>
-    <p class="takeaway">Subscribing to <b>everything</b> is what makes it private — a filter for one address would give you away. The cost is bandwidth, and it is bounded by a screen you actually have open.</p>
+    <p class="takeaway">Asking for <b>everything</b> is what keeps it private — asking for one address is what would give you away. The cost is bandwidth, and it is bounded by a screen you actually have open.</p>
   </figure>
 
   <!-- ═══ FIGURE 3 ═══ -->
@@ -346,23 +346,23 @@
 
   <!-- ═══ FIGURE 4 ═══ -->
   <figure class="fig" id="fig-musig">
-    <h2>4 · Three signatures that look like one.</h2>
-    <p class="sub">A MuSig2 vault needs every cosigner, coordinated over PSBTs with no server in the middle. Two rounds — public nonces, then partial signatures — collapse into a single Schnorr signature.</p>
+    <h2>4 · Two signatures that look like one.</h2>
+    <p class="sub">Elena and Mateo hold the family reserve together — a 2-of-2 MuSig2 vault, coordinated over PSBTs with no server in the middle. Two rounds, public nonces then partial signatures, collapse into a single Schnorr signature.</p>
     <div class="stage">
       <div class="f4">
         <div class="f4-stage">
           <h4>Round 1 · nonces</h4>
-          <p>Each device publishes a public nonce. Secret nonces never leave, never persist, and are zeroed after one use.</p>
-          <div class="f4-signers"><i></i><i></i><i></i></div>
+          <p>Each phone publishes a public nonce. The secret halves stay in the signing screen and never persist — leaving before round&nbsp;2 abandons the session.</p>
+          <div class="f4-signers"><i></i><i></i></div>
         </div>
         <div class="f4-stage">
           <h4>Round 2 · partials</h4>
-          <p>Each signs the same sighash with its own key, producing a partial signature verified before it is attached.</p>
-          <div class="f4-signers"><i></i><i></i><i></i></div>
+          <p>Elena and Mateo each sign the same sighash, producing a partial signature that is verified before it is attached. Signing zeroes the secret nonce.</p>
+          <div class="f4-signers"><i></i><i></i></div>
         </div>
         <div class="f4-stage">
           <h4>Aggregate</h4>
-          <p>The partials combine, and the result is checked against the vault's aggregate key before it is trusted.</p>
+          <p>The two partials combine, and the result is checked against the vault's aggregate key before it is trusted.</p>
           <div class="f4-signers"><i style="background:var(--mark)"></i></div>
         </div>
         <div class="f4-arrow">→</div>
@@ -374,7 +374,7 @@
         </div>
       </div>
     </div>
-    <p class="takeaway">n-of-n costs the chain <b>one signature</b>, so shared custody is as cheap and as private as a normal spend. The k-of-n vault is the honest opposite: it uses a script path, which is visibly multisig — a cost paid deliberately for “k of us, and nobody holds an escape hatch.”</p>
+    <p class="takeaway">Both-of-two costs the chain <b>one signature</b>, so the family reserve is as cheap and as private as an everyday spend. The k-of-n vault is the honest opposite: it uses a script path, which is visibly multisig — a cost paid deliberately for “k of us, and nobody holds an escape hatch.”</p>
   </figure>
 
   <!-- ═══ FIGURE 5 ═══ -->
@@ -408,7 +408,7 @@
 
 <footer>
   <div class="wrap">
-    Winnow — <a href="/">the wallet</a> · <a href="/read-side">the read side</a> · <a href="/write-side">the write side</a> · <a href="/vaults">vaults</a> · <a href="/import">import</a>
+    Winnow — <a href="/">the story</a> · <a href="/present">the walkthrough</a> · <a href="/paper">the paper</a> · <a href="/evidence">the evidence</a>
   </div>
 </footer>
 
