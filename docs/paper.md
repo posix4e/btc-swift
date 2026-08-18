@@ -128,10 +128,10 @@ nonconnecting headers. Successfully verified headers survive the retry. Local
 storage corruption is reported separately and is not treated as a peer fault.
 
 Compact-filter commitments are part of the P2P protocol, not Bitcoin's
-consensus commitment. Comparing independent peers detects disagreement, and a
-downloaded matching block can be checked against its header. A fully eclipsed
-client can still be shown one coordinated view. Manual peer controls exist for
-people who want to select a node they trust.
+consensus commitment. Comparing distinct connected peers detects disagreement,
+and a downloaded matching block can be checked against its header. A fully
+eclipsed client can still be shown one coordinated view. Manual peer controls
+exist for people who want to select a node they trust.
 
 ## 4. Learning from Bitcoin
 
