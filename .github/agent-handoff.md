@@ -626,3 +626,74 @@ now holds a **signet test wallet with a real seed in its Keychain**. It is
 valueless and isolated, but it is seed material sitting on disk. I have left it
 in place in case you want to reproduce; say the word and I will
 `xcrun simctl delete` it. Your story-run device (`F8A08928…`) was never touched.
+
+---
+
+## 2026-08-18 · Claude — handing over to Codex
+
+Owner says you are taking it from here. Everything of mine is pushed; I am
+stopping work and leaving the shared checkout on `main`. Nothing of yours was
+edited at any point.
+
+### State of PR #41
+
+Nine commits, still exactly two files: `.github/agent-handoff.md` and
+`docs/architecture.html`. Head is `ea09f69`. Your three formal reviews are all
+answered:
+
+- **C1 — complete.** Every item from both punch lists is in, including the
+  `cfcheckpt`-vs-`cfheaders` precision fix from your second render review. Your
+  four "still blocking" items were already fixed in `ad63342`, which landed
+  after the `4ab86ee` you reviewed — worth re-reading against head rather than
+  that commit.
+- **C2 — accepted by you**, re-verified against production after `9d3a4a1`.
+- **C3 — 4 of 5.** Items 1, 2a, 3, 5 pass. Items 2b (Settings re-reveal) and 4
+  (Esplora warning) are unverified.
+
+The page is unlinked from the site nav by design — whether it becomes
+`/architecture` or gets inlined into the story page was always your call, and
+still is.
+
+### What is genuinely open
+
+1. **Items 2b and 4.** Screenshot capture is refused by the harness's auto-mode
+   classifier, almost certainly because the preceding screen held a recovery
+   phrase. I did not re-attempt it through another tool. If you want item 4
+   without a screenshot, it is verifiable at source: `SettingsView.swift` gates
+   the toggle behind `showEsploraWarning` plus an alert. That is source-level
+   evidence, not observed behaviour, and should be labelled as such.
+2. **`docs/agent-handoff.html`** — the stale rendered copy of the old log. I
+   deleted it on my branch; if a deploy ran from `main` before #41 merges,
+   `/agent-handoff` may still resolve until the next build.
+3. **Bundle identifier** `com.btcswift.app` under Winnow branding. You ruled it
+   out of scope for this PR and I agree; it is permanent once a listing is live,
+   so it belongs to #7.
+
+### Cleanup done
+
+The throwaway simulator `winnow-c3-smoke` held a real signet seed in its
+Keychain. I have **deleted it** rather than leave seed material on disk at
+handover. To recreate:
+
+```
+xcrun simctl create winnow-c3-smoke \
+  com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max \
+  com.apple.CoreSimulator.SimRuntime.iOS-26-5
+xcodebuild -project WinnowApp.xcodeproj -scheme WinnowApp -sdk iphonesimulator \
+  -configuration Debug -derivedDataPath /tmp/c3-dd2 build      # no CODE_SIGNING_ALLOWED=NO
+```
+
+That flag is the trap: it strips the entitlements iOS needs for Keychain writes
+and makes wallet creation fail with a message that reads exactly like an app
+bug. Your story-run device `F8A08928…` was never touched.
+
+### For the record
+
+You caught three claims in my figures that the implementation does not support:
+invented per-block filter sizes, source/operator diversity `PeerPool` does not
+enforce, and a majority rule attributed to the wrong BIP157 path. The third was
+my own code from earlier the same day. The review loop worked, and it worked in
+the direction that matters — outward-facing claims got weaker and truer each
+round. Thanks for being exacting about it.
+
+Ping via this log or the PR if you want anything reopened.
