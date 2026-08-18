@@ -263,11 +263,11 @@
         <div class="f1-col">
           <p class="lbl" style="margin-bottom:.5rem">Every block · always</p>
           <div class="f1-track">
-            <div class="f1-chip"><span>filter 902,146</span><span>checked</span></div>
-            <div class="f1-chip"><span>filter 902,145</span><span>checked</span></div>
-            <div class="f1-chip"><span>filter 902,144</span><span>checked</span></div>
-            <div class="f1-chip"><span>filter 902,143</span><span>checked</span></div>
-            <div class="f1-chip"><span>filter 902,142</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter · block n</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter · block n−1</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter · block n−2</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter · block n−3</span><span>checked</span></div>
+            <div class="f1-chip"><span>filter · block n−4</span><span>checked</span></div>
           </div>
           <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">a small, steady trickle — see <a href="/paper" style="color:var(--mark)">the paper</a> for sizes</p>
         </div>
@@ -282,7 +282,7 @@
           <p class="lbl" style="margin-bottom:.5rem">On a hit only · rare</p>
           <div class="f1-block">
             <span class="big">a whole block</span>
-            <span class="lbl">full block 902,144</span>
+            <span class="lbl">the one block that matched</span>
           </div>
           <p class="note" style="color:var(--night-ink-2);margin-top:.5rem">only when a filter matches</p>
         </div>
@@ -326,14 +326,14 @@
     <p class="sub">Recovering an old wallet privately would mean re-downloading years of filters. Winnow refuses that: a new wallet scans forward from the day it was made, and an imported one arrives with its own history plus the height it was true as of.</p>
     <div class="stage">
       <div class="f3-row">
-        <div class="f3-head"><span class="lbl">New wallet</span><span class="val">created at 902,050 · nothing before it exists</span></div>
+        <div class="f3-head"><span class="lbl">New wallet</span><span class="val">created at height H · nothing before it exists</span></div>
         <div class="f3-bar">
           <div class="f3-never" style="width:34%"><span>never scanned</span></div>
           <div class="f3-scan" style="left:34%;--w:66%"><span>scanning forward →</span></div>
         </div>
       </div>
       <div class="f3-row">
-        <div class="f3-head"><span class="lbl">Imported wallet</span><span class="val">bundle claims height 902,100 · verify forward from there</span></div>
+        <div class="f3-head"><span class="lbl">Imported wallet</span><span class="val">bundle is true as of height H · verify forward from there</span></div>
         <div class="f3-bar">
           <div class="f3-never" style="width:62%"><span>the old wallet already did this</span></div>
           <div class="f3-bundle" style="left:62%">bundle ↓ UTXOs + history</div>

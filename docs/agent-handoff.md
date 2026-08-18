@@ -323,3 +323,84 @@ is out of date. I have not started C3; I will run it read-only under the stated
 safety rules (no broadcast, no recovery words recorded, no daemon installed, no
 app source edited) and append pass/fail per item with commands and redacted
 artifact paths.
+
+---
+
+## 2026-08-18 · Claude — C1 follow-ups, C2 on production, C3 partial (one blocker)
+
+### C1 follow-ups — both closed
+
+**Block heights removed, and checking them found a worse fault than "illustrative".**
+Figure 1 showed `902,142`–`902,146` and figure 3 showed `902,050` / `902,100`.
+Public signet's tip is **318,244** — those numbers read as *mainnet* heights on a
+page about a wallet that ships signet-first. A reader who knows the chain would
+conclude Winnow is running on mainnet. Now fully symbolic: `block n`, `block n−1`
+… and `height H`. No invented number remains anywhere in the figures
+(`grep '9\d\d,\d\d\d'` → none).
+
+**Nonce lifecycle — my wording stands, and here is the code it rests on** rather
+than my assertion. `MuSig.partialSign` zeroes the secret nonce in a `defer`, so
+it is cleared even when signing throws, and a second use trips `secnonceReused`
+on the k1/k2 zero check. `VaultSignView` holds the nonces only in `@State`; they
+are not `Codable`, not in `VaultRecord`, never written by `VaultStore.persist`,
+and never enter the PSBT (only the 66-byte public nonce is attached). So
+"stays in the signing screen, never persists, leaving before round 2 abandons
+the session, signing zeroes it" is exactly the implementation. If you still read
+a resumability claim in the figure, quote me the line and I will cut it.
+
+### C2 re-run against production — holds
+
+`/`, `/present`, `/paper`, `/evidence` all 200 on `winnowwallet.com`. Both
+independently verified txids are still present on the live evidence page. Live
+pages carry **zero** hard MB/KB/ms figures, and alt coverage is complete
+(`/` 5/5, `/present` 2/2). No change to the C2 verdict: **no blocker.**
+
+### C3 — partial: 1 of 5 evidenced, 4 blocked on device access
+
+**Environment.** Build commit `9d3a4a1` (origin/main) plus the working tree as
+shared. `xcodegen` regenerated `WinnowApp.xcodeproj`, which is gitignored
+(`.gitignore:4`), so **no tracked file was modified and no app source was
+edited**. Built with:
+
+```
+xcodebuild -scheme WinnowApp -sdk iphonesimulator -configuration Debug \
+  -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/c3-dd \
+  build CODE_SIGNING_ALLOWED=NO
+```
+
+**I did not touch the existing story run.** Your `iPhone 17 Pro Max`
+(`F8A08928…`) was already booted and I left it alone. I created a throwaway
+device `winnow-c3-smoke` (`10EB6EAB…`, iOS 26.5) for this work; delete it with
+`xcrun simctl delete 10EB6EAB-E637-4E05-B405-140859BE4987`.
+
+| # | Item | Result |
+|---|---|---|
+| 5 | Ordinary reads need no local `bitcoind` / Esplora fast path | **Pass (partial).** `pgrep bitcoind` → nothing running. The app installed, launched (pid 78206) and presented a fully operable onboarding screen with no local node present. Full read-path proof needs a funded wallet, which needs item 1. |
+| 1 | Wallet reaches recovery/copy step without waiting for header download | **Not verified — blocked.** The onboarding screen *states* it ("Your backup appears immediately; peer and header synchronization continues while you secure it"), but that is the app's claim, not my observation. |
+| 2 | Phrase copyable in onboarding and from Settings after auth | **Not verified — blocked.** |
+| 3 | Background sync visible but non-blocking | **Not verified — blocked.** |
+| 4 | Esplora optional, privacy warning before the network action | **Not verified — blocked.** |
+
+**The blocker, stated plainly.** Driving the UI needs device access through the
+simulator control tool, and that consent request went unanswered (owner away).
+Your brief says *report blockers rather than improvise around authentication*, so
+I stopped rather than route around it. I used `xcrun simctl` for
+**non-interactive observation only** — install, launch, one screenshot, log
+capture on a simulator I created with my own build — and injected no input.
+
+To finish C3 I need one of: the owner granting device access ("Let Claude use
+it" on the panel), or your permission to drive the existing `WinnowAppUITests`
+target with a **read-only subset** — which I have not run, because those
+scenarios broadcast and would violate the no-broadcast rule and could disturb
+the story run.
+
+**No recovery words were displayed, captured, or recorded.** I never advanced
+past the first screen. Artifact: `/tmp/c3-art/01-launch.png` (onboarding only,
+no secrets).
+
+### Incidental finding, outside all three assignments
+
+The app still ships as **`com.btcswift.app`** (`Info.plist` on the built
+product) while everything user-facing is Winnow. A bundle ID cannot be changed
+once a listing is live on the App Store, so this is decided permanently at first
+submission (#7), not later. Flagging only — I have not touched `project.yml`.
