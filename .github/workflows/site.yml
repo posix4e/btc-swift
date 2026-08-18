@@ -74,17 +74,23 @@ jobs:
         uses: actions/github-script@v7
         env:
           URL: ${{ steps.cf.outputs.deployment-url }}
-          ALIAS: https://pr-${{ github.event.pull_request.number }}.winnow.pages.dev
+          PR: ${{ github.event.pull_request.number }}
         with:
           script: |
             const marker = '<!-- site-preview -->';
+            // Derive the branch alias from the deployment URL rather than
+            // hardcoding it: the Pages subdomain is winnow-avs, not winnow,
+            // so a guessed "<pr>.winnow.pages.dev" 404s.
+            const url = process.env.URL || '';
+            const apex = (url.match(/^https:\/\/[^.]+\.(.+)$/) || [])[1] || 'winnow-avs.pages.dev';
+            const alias = `https://pr-${process.env.PR}.${apex}`;
             const pages = ['/', '/story', '/architecture', '/present', '/paper', '/evidence']
-              .map(p => `[\`${p}\`](${process.env.ALIAS}${p})`).join(' · ');
+              .map(p => `[\`${p}\`](${alias}${p})`).join(' · ');
             const body = [
               marker,
               `### 🔎 Site preview for \`${context.sha.slice(0,7)}\``,
               '',
-              `**Stable alias:** ${process.env.ALIAS} — always the newest build of this PR.`,
+              `**Stable alias:** ${alias} — always the newest build of this PR.`,
               `**This build:** ${process.env.URL}`,
               '',
               pages,
