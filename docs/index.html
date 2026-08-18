@@ -286,16 +286,13 @@
   .policy-line b{display:block;color:var(--ink);font-size:.96rem}
   .threshold{font:650 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--seed);margin-bottom:.8rem}
 
-  .truth-grid,.proof-grid{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:1rem;overflow:hidden;margin-top:2.5rem}
-  @media(min-width:44rem){.truth-grid{grid-template-columns:repeat(2,1fr)}.proof-grid{grid-template-columns:repeat(3,1fr)}}
-  .truth,.proof{background:var(--card);padding:1.45rem}
+  .truth-grid{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:1rem;overflow:hidden;margin-top:2.5rem}
+  @media(min-width:44rem){.truth-grid{grid-template-columns:repeat(2,1fr)}}
+  .truth{background:var(--card);padding:1.45rem}
   .truth h3{font-size:1.15rem;margin:.55rem 0 .4rem}
-  .truth p,.proof p{font-size:.9rem;color:var(--ink-2)}
+  .truth p{font-size:.9rem;color:var(--ink-2)}
   .truth h3{display:flex;align-items:center;gap:.55rem}
   .truth h3::before{content:"";width:.55rem;height:.55rem;border:2px solid var(--mark);border-radius:50%;flex:none}
-  .proof .state{font:600 .66rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--good)}
-  .proof h3{margin:.55rem 0 .4rem}
-  .proof a{font-family:var(--mono);font-size:.72rem}
   .cta-panel{background:linear-gradient(135deg,#17130c,#0e0d0a);color:var(--night-ink);border-radius:1.4rem;padding:clamp(2rem,6vw,4rem);text-align:center}
   .cta-panel .sub{color:var(--night-ink-2);margin:1rem auto 0}
   code{font-family:var(--mono);font-size:.88em}
@@ -484,26 +481,6 @@
       <article class="truth"><h3>Two institutions can act without you</h3><p>In the professional 2-of-3 model, the exchange and trust together satisfy Bitcoin even when the owner is unavailable—or objects. Contracts, jurisdiction, privacy, fees, and counterparty risk matter.</p></article>
       <article class="truth"><h3>A miner route is not anonymity</h3><p>Direct submission may avoid ordinary peer diffusion, but the selected miner receives the raw transaction and connection metadata. The feature is planned; P2P remains Winnow's shipping default.</p></article>
     </div>
-  </div>
-</section>
-
-<!-- ══ evidence ══ -->
-<section class="night" id="evidence">
-  <div class="wrap center narrow">
-    <p class="eyebrow">Verified on public signet</p>
-    <h2>The claims have transaction evidence.</h2>
-    <p class="sub" style="margin-top:1rem">Standard payments, replacement, both 2-of-3 paths, and the MuSig2 key-path spend were observed and confirmed. Silent receiving remains outside the pass set.</p>
-  </div>
-  <div class="wrap">
-    <div class="proof-grid" style="--card:var(--night-2);--rule:var(--night-rule)">
-      <article class="proof"><span class="state">Confirmed</span><h3>Hot-wallet funding</h3><p>A personal wallet receives its first UTXO.</p><a href="https://explorer.bc-2.jp/tx/44890b72d9910a4ad9390a1f1e1ade446bde809ceb1736128274199e48e935c0">44890b72…935c0</a></article>
-      <article class="proof"><span class="state">Confirmed</span><h3>Final RBF replacement</h3><p>The higher-fee supplier payment confirms.</p><a href="https://explorer.bc-2.jp/tx/543a9cf35d1db26dc8b656d78a3b6c5fe88d23b4a4710883f521f6800814ff65">543a9cf3…ff65</a></article>
-      <article class="proof"><span class="state">Confirmed</span><h3>2-of-3 reserve funding</h3><p>A hot wallet funds the threshold reserve.</p><a href="https://explorer.bc-2.jp/tx/0e860e416d346caca681f2a1b6016f9976787c363b2a4e1178bf2c07d0ebe791">0e860e41…e791</a></article>
-      <article class="proof"><span class="state">Confirmed</span><h3>Owner + lender</h3><p>The ordinary 2-of-3 path returns liquidity.</p><a href="https://explorer.bc-2.jp/tx/46081b3dfb1f841bf5642737082cb88e376cc6f967fba2109ce55991aa0e698a">46081b3d…698a</a></article>
-      <article class="proof"><span class="state">Confirmed</span><h3>Lender + trust</h3><p>The continuity path works without the owner.</p><a href="https://explorer.bc-2.jp/tx/7df05a8190ccfd3ae7f39e48118616cbe210561c74d41d7f23328e86e6028cbb">7df05a81…8cbb</a></article>
-      <article class="proof"><span class="state">Confirmed</span><h3>Two-party MuSig2</h3><p>MuSig2 produces a Taproot key-path spend.</p><a href="https://explorer.bc-2.jp/tx/1b1261381ae44e1d3a0d99bfbc2bb9d428223a45f2a26642b0fcf7a17c51dc03">1b126138…dc03</a></article>
-    </div>
-    <p class="note center" style="margin-top:1.3rem"><a href="/evidence" style="color:var(--mark)">Read the sanitized evidence summary →</a></p>
   </div>
 </section>
 
