@@ -350,3 +350,55 @@ struct CheckpointStartTests {
         #expect(await reopened.startHeight == 0)
     }
 }
+
+
+/// Choosing where to start for a given wallet (#89 phase 3).
+///
+/// This is the rule that keeps a speed optimisation from becoming a wrong
+/// balance, so it is worth stating case by case.
+@Suite("Checkpoint start policy")
+struct CheckpointStartPolicyTests {
+    private let mainnet = NetworkParams.params(for: .mainnet).checkpoint
+    private var cpHeight: UInt32 { mainnet?.height ?? 0 }
+
+    @Test("no wallet yet: the checkpoint is free to use")
+    func noWallet() {
+        #expect(HeaderChain.Start.forWallet(birthday: nil, checkpoint: mainnet,
+                                            verifyFromGenesis: false) == .checkpoint)
+    }
+
+    @Test("a wallet born at or after the checkpoint keeps the fast path")
+    func modernWallet() {
+        #expect(HeaderChain.Start.forWallet(birthday: cpHeight, checkpoint: mainnet,
+                                            verifyFromGenesis: false) == .checkpoint)
+        #expect(HeaderChain.Start.forWallet(birthday: cpHeight + 50_000, checkpoint: mainnet,
+                                            verifyFromGenesis: false) == .checkpoint)
+    }
+
+    @Test("a wallet older than the checkpoint gets the whole chain, setting or not")
+    func olderWalletOverridesTheDefault() {
+        // The blocks holding its coins are below the checkpoint, and filters
+        // are fetched by block hash — a checkpoint-rooted chain simply cannot
+        // ask about them. Reporting a balance short by whatever is down there
+        // would be worse than a slow first launch.
+        #expect(HeaderChain.Start.forWallet(birthday: 0, checkpoint: mainnet,
+                                            verifyFromGenesis: false) == .genesis)
+        #expect(HeaderChain.Start.forWallet(birthday: cpHeight - 1, checkpoint: mainnet,
+                                            verifyFromGenesis: false) == .genesis)
+    }
+
+    @Test("the setting always wins toward more verification, never toward less")
+    func settingOnlyAddsWork() {
+        for birthday: UInt32? in [nil, 0, cpHeight, cpHeight + 1] {
+            #expect(HeaderChain.Start.forWallet(birthday: birthday, checkpoint: mainnet,
+                                                verifyFromGenesis: true) == .genesis)
+        }
+    }
+
+    @Test("a network with no checkpoint always starts at genesis")
+    func noCheckpoint() {
+        #expect(NetworkParams.params(for: .signet).checkpoint == nil)
+        #expect(HeaderChain.Start.forWallet(birthday: 900_000, checkpoint: nil,
+                                            verifyFromGenesis: false) == .genesis)
+    }
+}

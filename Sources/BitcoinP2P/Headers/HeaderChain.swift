@@ -82,6 +82,29 @@ public actor HeaderChain {
     public enum Start: Sendable, Equatable {
         case genesis
         case checkpoint
+
+        /// Chooses where the chain should start for a given wallet.
+        ///
+        /// The checkpoint is a speed decision and must never become a
+        /// correctness one. Compact filters are fetched by block hash, so a
+        /// chain starting at the checkpoint cannot scan blocks below it — and a
+        /// wallet whose history begins earlier would report a balance missing
+        /// whatever it holds down there. Anything older than the checkpoint
+        /// therefore starts at genesis regardless of the setting.
+        ///
+        /// - Parameters:
+        ///   - walletBirthday: the lowest height whose filters the wallet still
+        ///     needs; nil when there is no wallet yet.
+        ///   - checkpoint: the network's checkpoint, if it ships one.
+        ///   - verifyFromGenesis: the user's setting.
+        public static func forWallet(birthday walletBirthday: UInt32?,
+                                     checkpoint: NetworkParams.Checkpoint?,
+                                     verifyFromGenesis: Bool) -> Start {
+            if verifyFromGenesis { return .genesis }
+            guard let checkpoint else { return .genesis }
+            guard let walletBirthday else { return .checkpoint }
+            return walletBirthday >= checkpoint.height ? .checkpoint : .genesis
+        }
     }
 
     public init(params: NetworkParams, storageURL: URL? = nil, start: Start = .genesis) throws {

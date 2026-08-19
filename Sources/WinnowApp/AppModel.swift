@@ -355,7 +355,7 @@ final class AppModel {
             // header's linkage/work is intentionally CPU-heavy. Keep that
             // validation intact but off the MainActor so relaunching during
             // backup never freezes the onboarding sheet.
-            let start: HeaderChain.Start = verifyFromGenesis ? .genesis : .checkpoint
+            let start = await chainStart()
             let chain = try await Task.detached(priority: .userInitiated) {
                 do {
                     return try HeaderChain(params: params, storageURL: headersURL, start: start)
@@ -379,6 +379,17 @@ final class AppModel {
         } catch {
             status.lastSyncError = error.localizedDescription
         }
+    }
+
+    /// Where the header chain should begin for the wallet we actually have.
+    /// The rule itself lives in `HeaderChain.Start.forWallet` so it can be
+    /// tested; this only supplies the wallet's birthday.
+    private func chainStart() async -> HeaderChain.Start {
+        var birthday: UInt32?
+        if let wallet { birthday = min(await wallet.creationHeight, await wallet.nextScanHeight) }
+        return .forWallet(birthday: birthday,
+                          checkpoint: NetworkParams.params(for: network).checkpoint,
+                          verifyFromGenesis: verifyFromGenesis)
     }
 
     private func makeFilterSync(pool: PeerPool, chain: HeaderChain, startHeight: UInt32) throws -> FilterSync {
@@ -639,9 +650,22 @@ final class AppModel {
         walletID = await wallet.id
         walletDescriptor = await wallet.descriptor
         if var stack {
-            stack.filters = try await makeFilterSync(pool: stack.pool, chain: stack.chain,
-                                                     startHeight: wallet.nextScanHeight)
-            self.stack = stack
+            // An imported wallet can be older than the chain we are holding —
+            // its filters live in blocks a checkpoint start skipped, and those
+            // filters are fetched by block hash, so they are simply not
+            // reachable. Drop the stack and rebuild from genesis rather than
+            // scan a range that cannot answer.
+            if await stack.chain.startHeight > (await wallet.nextScanHeight) {
+                syncTask?.cancel()
+                syncTask = nil
+                await stack.pool.stop()
+                self.stack = nil
+                await buildStackIfNeeded()
+            } else {
+                stack.filters = try await makeFilterSync(pool: stack.pool, chain: stack.chain,
+                                                         startHeight: wallet.nextScanHeight)
+                self.stack = stack
+            }
         }
         await refresh()
         if startSync, isActive { startSyncLoop() }
