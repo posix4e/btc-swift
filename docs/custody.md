@@ -35,7 +35,9 @@ Winnow can combine two keys into one before anything reaches the chain. What get
 
 That is worth more than the fee saving.
 
-Ordinary multisig announces itself. When it is spent, the chain reveals the policy it spent under, so anyone reading it learns you keep additional signers and how many signatures standing between them and your money. Combining the keys publishes none of that. Nobody learns there is a second device — which means nobody learns there is a second device worth coming to look for.
+Ordinary multisig announces itself. When it is spent, the chain reveals the policy it spent under — how many keys exist, how many must sign, and often enough about the script to guess what kind of device is holding them. Combining the keys publishes none of that. Nobody learns that a second device exists, where it might be, or whose hardware it is.
+
+That last part matters. A published policy is a shopping list: it tells someone which vendor's weakness is worth researching, and how many devices they would need to reach. An aggregated spend tells them you are one person with one wallet, which is what most of the chain looks like.
 
 The trade: combined keys are all-or-nothing. Two of two, three of three. If you need "any two of these three", that is the next section, and it is visible on the chain when spent.
 
@@ -55,7 +57,11 @@ This is the shape for every problem that is not about the maker:
 
 **Working with an institution.** A company whose business is holding one key can hold one — for a loan against your coins, or a custody arrangement — without ever being able to spend alone. You keep enough keys that they need you. They keep enough that losing your phone is not the end.
 
-The cost is visibility: spending this way publishes the policy. Anyone reading the chain sees that it took two signatures out of three. That is the honest price of being able to lose a key.
+Spending this way publishes the policy: anyone reading the chain sees it took two signatures out of three.
+
+That is a real privacy cost, and for the coercion case it is also the point. Deterrence only works on people who know. Somebody who studies you before knocking on your door learns from the chain that you cannot move the money by yourself, and that whoever holds the other key is not in the room. The threat stops being worth making. A wallet that hides its policy perfectly cannot deter anyone, because nobody knows there is anything to be deterred by.
+
+So the two shapes protect against opposite things, and it is worth being deliberate about which you want. Combined keys hide that you have a second signer at all. A published k-of-n advertises that coming for you personally will not work. Note that the advertisement only exists once you have spent from the wallet — an output nobody has spent from looks like any other.
 
 ---
 

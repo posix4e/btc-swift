@@ -445,7 +445,7 @@
           <h3>Two devices, and both have to agree.</h3>
           <p>Set up a wallet whose money only moves when two devices sign. Someone who steals one phone, or finds one recovery phrase, still cannot spend a thing.</p>
           <p>The risk is the maker, not just the thief. Hardware has shipped with keys an attacker could guess; software has shipped with signing bugs. Either takes everything behind it at once, and you cannot audit your way out. Two keys on devices from two different makers means one of them can be wrong and your money survives it.</p>
-          <p>And nobody has to know you did it. Combined the aggregated way, two keys produce one signature: 64 bytes, no policy published, nothing on the chain saying a second device exists. Most multisig advertises itself to anyone reading the chain. This does not.</p>
+          <p>And nobody has to know you did it. Combined the aggregated way, two keys produce one signature: 64 bytes, no policy published. Nobody learns that a second device exists, where it is, or whose hardware it is. Most multisig tells anyone reading the chain all three.</p>
           <div class="fact"><b>Why two beats one:</b> two devices running the same app share whatever that app gets wrong, so the pair is strongest when they come from different makers. Winnow's multisig is a published Bitcoin standard rather than a scheme of its own, which is what lets the second key live somewhere else.</div>
         </div>
       </article>
@@ -494,7 +494,7 @@
           <span class="persona" style="--persona:#62896b">Three keys</span>
           <h3>Two of three, so losing one is survivable.</h3>
           <p>Everything that isn't about the maker is solved here. Hold two keys yourself and place a third with someone else — a family member, or a company whose business is holding one. Any two of the three can move money, so a phone in a river is an inconvenience rather than a catastrophe.</p>
-          <p>It also changes what you can be made to do. Someone standing over you cannot get the money out of you, because you genuinely cannot send it alone. The third key is elsewhere, and no amount of pressure moves it.</p>
+          <p>It also changes what you can be made to do. Someone standing over you cannot get the money out of you, because you genuinely cannot send it alone — and once you have spent from the wallet, the chain says so. Anyone who looks you up first learns that coming for you personally does not work.</p>
           <p>And it outlives you. If you can no longer sign, the other two can — after whatever real-world checks you set — which is how an estate is settled without handing anyone your keys while you are alive, and how a company holding one key takes part in a loan.</p>
         </div>
       </article>
