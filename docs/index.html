@@ -364,17 +364,20 @@
 
       <article class="beat">
         <div class="beat-media">
-          <div class="device"><div class="island"></div><div class="screen">
-            <img src="screenshots/15-vault-cosign.png" width="1320" height="2868" loading="lazy" alt="Winnow's cosigning screen, showing the payment details a second device is being asked to approve.">
-          </div></div>
-          <p class="caption">The second device approves a payment, not a prompt.</p>
+          <div class="policy-card" role="group" aria-label="A two-key wallet: this phone and a separate device, both required to sign">
+            <p class="threshold">Two keys · both must sign</p>
+            <div class="policy-line"><span class="key-dot" style="--key:#f7931a"></span><span><b>This phone</b>Signs in your hand</span></div>
+            <div class="policy-line"><span class="key-dot" style="--key:#315a8a"></span><span><b>A separate device</b>Built by someone else, signs on its own screen</span></div>
+            <div class="policy-line"><span class="key-dot" style="--key:#2e8b88"></span><span><b>The payment</b>Moves only once both have signed</span></div>
+          </div>
+          <p class="caption">Neither device can spend on its own.</p>
         </div>
         <div class="beat-copy">
           <span class="persona" style="--persona:#2e8b88">Two keys</span>
           <h3>Two devices, and both have to agree.</h3>
           <p>Set up a wallet whose money only moves when two devices sign. Someone who steals one phone, or finds one recovery phrase, still cannot spend a thing.</p>
-          <p>A single hardware wallet is one device you have to be right about. If its keys were made badly, everything behind it is exposed at once. Two devices have to fail together.</p>
-          <div class="fact"><b>Why two beats one:</b> two devices running the same app share whatever that app gets wrong. Winnow's multisig is a published Bitcoin standard rather than a scheme of its own, so the second key can live on a wallet built by someone else entirely.</div>
+          <p>A single hardware wallet is one device you have to be right about. Devices have shipped with keys that were guessable, and when that happens every coin behind them is exposed at once. A thief who breaks one of your two keys still has nothing to spend with.</p>
+          <div class="fact"><b>Why two beats one:</b> two devices running the same app share whatever that app gets wrong, so the pair is strongest when they come from different makers. Winnow's multisig is a published Bitcoin standard rather than a scheme of its own, which is what lets the second key live somewhere else.</div>
         </div>
       </article>
 
