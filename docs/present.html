@@ -13,8 +13,8 @@
 <meta property="og:image" content="https://winnowwallet.com/og.png">
 <style>
 :root{
-  --paper:#fcfbf9;--paper-2:#f4f1ea;--ink:#14130e;--ink-2:#585549;--ink-3:#8a8577;
-  --rule:#e5e1d6;--rule-2:#d6d1c2;--seed:#b35f05;--mark:#f7931a;--good:#1f7a4d;--card:#fff;
+  --paper:#ffffff;--paper-2:#f7f4ee;--ink:#14130e;--ink-2:#585549;--ink-3:#8a8577;
+  --rule:#e8e0d0;--rule-2:#d6d1c2;--seed:#b35f05;--mark:#f7931a;--good:#1f7a4d;--card:#fff;
   --night:#100e0a;--night-2:#1b1811;--night-ink:#f2eee4;--night-ink-2:#a8a294;--night-rule:#2d281d;
   --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
@@ -24,17 +24,18 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;letter-spacing:-.011em;-webkit-font-smoothing:antialiased}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.58;letter-spacing:-.011em;-webkit-font-smoothing:antialiased}
 a{color:var(--seed);text-decoration:none}
 a:hover{text-decoration:underline;text-underline-offset:3px}
 :focus-visible{outline:2px solid var(--mark);outline-offset:3px;border-radius:6px}
 .wrap{width:min(64rem,100%);margin:0 auto;padding:0 clamp(1.1rem,4vw,2rem)}
-.eyebrow{font-family:var(--mono);font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.13em;color:var(--seed);margin-bottom:.9rem}
+.eyebrow{font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--seed);margin-bottom:.85rem}
 
 /* topbar */
-.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--rule)}
+.topbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:saturate(180%) blur(16px);border-bottom:1px solid var(--rule)}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;height:46px}
-.brand{font-weight:650;letter-spacing:-.02em;display:flex;align-items:center;gap:.5rem}
+.brand{font-weight:680;letter-spacing:-.02em;display:flex;align-items:center;gap:.5rem}
 .brand b{color:var(--mark)}
 .links{display:flex;gap:1.2rem;font-size:.86rem}
 .links a{color:var(--ink-2)}
@@ -42,52 +43,74 @@ a:hover{text-decoration:underline;text-underline-offset:3px}
 @media(max-width:28rem){.links a.hide-sm{display:none}}
 
 /* deck */
-.deck{min-height:100svh;display:grid;align-items:center;padding:clamp(5.5rem,9vw,7rem) 0 clamp(3rem,6vw,4rem)}
-.hero-grid{display:grid;gap:clamp(2rem,5vw,3.5rem);align-items:start}
-@media(min-width:56rem){.hero-grid{grid-template-columns:1.08fr .92fr}}
-h1{font-size:clamp(2.4rem,5vw,3.6rem);line-height:1.05;letter-spacing:-.032em;font-weight:720;text-wrap:balance}
-h1 .soft{color:var(--ink-3);font-weight:600}
-.lead{font-size:clamp(1.02rem,1.7vw,1.18rem);color:var(--ink-2);line-height:1.45;margin-top:1rem;max-width:34rem}
-.note{font-size:.82rem;color:var(--ink-3);margin-top:1.1rem;max-width:34rem}
+.deck{padding:clamp(3.5rem,7vw,5.5rem) 0 clamp(3rem,6vw,4rem)}
+.hero-grid{display:grid;gap:clamp(2.2rem,5vw,3.8rem);align-items:start}
+@media(min-width:56rem){.hero-grid{grid-template-columns:1.15fr .85fr}}
+h1{font-size:clamp(2.3rem,5vw,3.45rem);line-height:.98;letter-spacing:-.035em;font-weight:720;text-wrap:balance}
+h1 .soft{display:block;color:var(--ink-2);font-weight:520;font-size:.92em;margin-top:.15rem}
+.lead{font-size:clamp(1.0rem,1.6vw,1.15rem);color:var(--ink-2);line-height:1.5;margin-top:1.05rem;max-width:33rem}
+.note{font-size:.82rem;color:var(--ink-3);margin-top:1rem;max-width:33rem;line-height:1.5}
 .note b{color:var(--ink);font-weight:620}
 
+/* subtle divider under headline */
+.rule{height:1px;background:var(--rule);margin:1.4rem 0 0;max-width:33rem}
+
 /* agenda */
-.agenda{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:1.1rem;overflow:hidden;margin-top:1.6rem}
+.agenda{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:14px;overflow:hidden;margin-top:1.5rem}
+.agenda a.stop{text-decoration:none}
 @media(min-width:48rem){.agenda{grid-template-columns:1fr 1fr}}
-.stop{background:var(--card);padding:1.2rem 1.15rem;display:flex;gap:.9rem;align-items:flex-start}
-.stop-num{font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);border:1px solid var(--rule-2);border-radius:2rem;padding:.28rem .55rem;flex:none;margin-top:.15rem}
-.stop h3{font-size:.98rem;letter-spacing:-.015em;margin:0}
-.stop h3 a{color:var(--ink)}
-.stop h3 a:hover{color:var(--seed)}
-.stop p{font-size:.88rem;color:var(--ink-2);line-height:1.45;margin:.3rem 0 0}
-.stop .meta{font-family:var(--mono);font-size:.68rem;color:var(--ink-3);letter-spacing:.06em;margin-top:.5rem}
-.stop.learn{background:linear-gradient(180deg,var(--card),var(--paper-2))}
-.stop.learn .stop-num{border-color:var(--mark);color:var(--seed);background:color-mix(in srgb,var(--mark) 10%,transparent)}
+.agenda .stop:last-child{grid-column:1 / -1}
+.stop{background:var(--card);padding:1.15rem 1.1rem;display:flex;gap:.85rem;align-items:flex-start;transition:background .15s ease}
+.stop:hover{background:color-mix(in srgb,var(--card) 92%,var(--paper-2))}
+.stop-num{font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.07em;color:var(--ink-3);border:1px solid var(--rule-2);border-radius:999px;padding:.28rem .52rem;flex:none;margin-top:.12rem;background:var(--paper)}
+.stop h3{font-size:.97rem;letter-spacing:-.015em;margin:0;line-height:1.25}
+.stop p{font-size:.86rem;color:var(--ink-2);line-height:1.45;margin:.28rem 0 0}
+.stop .meta{font-family:var(--mono);font-size:.67rem;color:var(--ink-3);letter-spacing:.05em;margin-top:.45rem}
+.stop.learn{background:var(--paper-2)}
+.stop.learn .stop-num{border-color:var(--mark);color:var(--seed);background:#fff}
+.stop.learn:hover{background:color-mix(in srgb,var(--paper-2) 88%,white)}
 
 /* ctas */
-.cta{display:flex;flex-wrap:wrap;gap:.65rem;margin-top:1.6rem}
-.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.66rem 1.1rem;border-radius:2rem;font-size:.93rem;font-weight:550;border:1px solid var(--mark);background:var(--mark);color:#17140f}
-.btn:hover{filter:brightness(1.06);text-decoration:none}
+.cta{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.5rem}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.62rem 1.05rem;border-radius:999px;font-size:.92rem;font-weight:560;border:1px solid var(--mark);background:var(--mark);color:#17140f;transition:filter .15s ease}
+.btn:hover{filter:brightness(1.05);text-decoration:none}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule-2)}
 .btn.ghost:hover{border-color:var(--ink-3);filter:none}
 
-/* footer strip */
-.foot{border-top:1px solid var(--rule);padding:1.4rem 0 2rem;margin-top:clamp(2.5rem,6vw,4rem);font-size:.84rem;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:.8rem 1.2rem;justify-content:space-between}
+/* right column cards */
+.card{border:1px solid var(--rule);background:var(--card);border-radius:14px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.card-head{padding:1.1rem 1.2rem 0}
+.card-head .label{font:600 .68rem var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.card-body{padding:.9rem 1.2rem 1.2rem}
+.takeaway{ display:grid;gap:.85rem }
+.takeaway .row{ display:grid;grid-template-columns:16px 1fr;gap:.6rem;align-items:start }
+.takeaway .tick{ width:16px;height:16px;border-radius:999px;background:color-mix(in srgb,var(--mark) 14%,transparent);border:1px solid color-mix(in srgb,var(--mark) 30%,transparent);display:grid;place-items:center;margin-top:.15rem }
+.takeaway .tick svg{ width:8px;height:8px;display:block }
+.takeaway p{ font-size:.89rem;color:var(--ink-2);line-height:1.5;margin:0 }
+.takeaway b{ color:var(--ink);font-weight:630 }
+.card-foot{border-top:1px solid var(--rule);padding:.85rem 1.2rem;background:color-mix(in srgb,var(--paper-2) 55%,transparent);font-size:.8rem;color:var(--ink-3);line-height:1.45}
+.qr-card{margin-top:1rem;border:1px dashed var(--rule-2);border-radius:14px;padding:1rem;text-align:center;background:var(--paper)}
+.qr-card .label{font:600 .68rem var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.qr-card img{width:8.2rem;height:8.2rem;margin:.7rem auto 0;background:#fff;padding:.35rem;border-radius:10px;border:1px solid var(--rule);display:block}
+.qr-card .url{font:600 .7rem var(--mono);color:var(--ink-3);margin-top:.5rem;letter-spacing:.02em}
+
+/* footer */
+.foot{border-top:1px solid var(--rule);padding:1.35rem 0 2rem;margin-top:2.8rem;font-size:.82rem;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:.8rem 1.2rem;justify-content:space-between}
 .foot a{color:var(--ink-2)}
 
-/* present mode (kept minimal — deck is 2 slides) */
+/* present mode */
 .scene{display:none}
 .scene.active{display:block}
 body.presenting{overflow:hidden}
 body.presenting .topbar{display:none}
-body.presenting .scene{display:none;min-height:100svh;padding:clamp(2rem,6vw,4rem) clamp(1.1rem,4vw,2rem) 4rem;align-items:center}
+body.presenting .scene{display:none;min-height:100svh;padding:clamp(2rem,6vw,3.5rem) clamp(1.1rem,4vw,2rem) 3.5rem;align-items:center}
 body.presenting .scene.active{display:grid}
-.controls{display:none;position:fixed;inset:auto 0 0;padding:.6rem 1rem;background:color-mix(in srgb,var(--night) 92%,transparent);color:#f2eee4;align-items:center;justify-content:space-between;gap:1rem;z-index:30}
+.controls{display:none;position:fixed;inset:auto 0 0;padding:.55rem 1rem;background:var(--night);color:#f2eee4;align-items:center;justify-content:space-between;gap:1rem;z-index:30;border-top:1px solid var(--night-rule)}
 body.presenting .controls{display:flex}
-.counter{font:600 .75rem var(--mono)}
-.dots{display:flex;gap:.35rem}
-.dots button{width:.55rem;height:.55rem;border:0;border-radius:50%;background:#5a5447;cursor:pointer;padding:0}
-.dots button[aria-current="true"]{background:var(--mark);transform:scale(1.2)}
+.counter{font:600 .74rem var(--mono)}
+.dots{display:flex;gap:.34rem}
+.dots button{width:.52rem;height:.52rem;border:0;border-radius:50%;background:#4a4438;cursor:pointer;padding:0}
+.dots button[aria-current="true"]{background:var(--mark)}
 .hint{font-size:.7rem;color:#a8a294}
 @media(max-width:40rem){.hint{display:none}}
 </style>
@@ -115,10 +138,11 @@ body.presenting .controls{display:flex}
         <p class="eyebrow">Present · live walkthrough · 10 min</p>
         <h1>We’ll walk the site, <span class="soft">not the slides.</span></h1>
         <p class="lead">This page is just the map. The story is already on the site — we’ll open it live and talk through it in order.</p>
+        <div class="rule"></div>
         <p class="note">Most of what we’ll cover has a page. <b>“What I learned”</b> is the only stop that lives here — the rest are existing pages we’ll jump to.</p>
 
         <div class="agenda" role="list">
-          <a class="stop" href="/" role="listitem" style="text-decoration:none">
+          <a class="stop" href="/" role="listitem">
             <span class="stop-num">01</span>
             <div>
               <h3>Front webpage <span style="color:var(--ink-3);font-weight:400">→ /</span></h3>
@@ -126,7 +150,7 @@ body.presenting .controls{display:flex}
               <div class="meta">Existing page · 2 min</div>
             </div>
           </a>
-          <a class="stop" href="/custody" role="listitem" style="text-decoration:none">
+          <a class="stop" href="/custody" role="listitem">
             <span class="stop-num">02</span>
             <div>
               <h3>How you hold it <span style="color:var(--ink-3);font-weight:400">→ /custody</span></h3>
@@ -134,7 +158,7 @@ body.presenting .controls{display:flex}
               <div class="meta">Existing page · 3 min</div>
             </div>
           </a>
-          <a class="stop" href="/architecture" role="listitem" style="text-decoration:none">
+          <a class="stop" href="/architecture" role="listitem">
             <span class="stop-num">03</span>
             <div>
               <h3>Architecture <span style="color:var(--ink-3);font-weight:400">→ /architecture</span></h3>
@@ -150,12 +174,12 @@ body.presenting .controls{display:flex}
               <div class="meta">Lives on this page · 2 min</div>
             </div>
           </div>
-          <a class="stop" href="/paper.md#12-implementation-roadmap" role="listitem" style="text-decoration:none">
+          <a class="stop" href="/paper.md#12-implementation-roadmap" role="listitem">
             <span class="stop-num">05</span>
             <div>
               <h3>Roadmap <span style="color:var(--ink-3);font-weight:400">→ /paper.md#12</span></h3>
               <p>What’s next — 2-wallet ceremony, hardware transports, provider packages, miner pilot. Tracked in epic #60.</p>
-              <div class="meta">Existing page · 1 min · <span style="color:var(--ink-2)">github.com/posix4e/winnow/issues/60</span></div>
+              <div class="meta">Existing page · 1 min · github.com/posix4e/winnow/issues/60</div>
             </div>
           </a>
         </div>
@@ -168,19 +192,21 @@ body.presenting .controls{display:flex}
       </div>
 
       <div>
-        <div style="border:1px solid var(--rule);border-radius:1.1rem;background:var(--card);padding:1.3rem;box-shadow:0 18px 45px rgba(0,0,0,.06)">
-          <p style="font:600 .7rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.7rem">What I learned — lives here</p>
-          <div style="display:grid;gap:.9rem">
-            <div style="display:flex;gap:.7rem"><span style="color:var(--mark)">—</span><p style="font-size:.92rem;color:var(--ink-2);line-height:1.5"><b style="color:var(--ink)">Smallest policy that fits.</b> A wallet you find annoying is a wallet you empty into a worse one.</p></div>
-            <div style="display:flex;gap:.7rem"><span style="color:var(--mark)">—</span><p style="font-size:.92rem;color:var(--ink-2);line-height:1.5"><b style="color:var(--ink)">Two makers, not two phones.</b> MuSig2 hides the second signer (one 64-byte sig); 2-of-3 advertises it — and that advertisement <em>is</em> the coercion deterrent.</p></div>
-            <div style="display:flex;gap:.7rem"><span style="color:var(--mark)">—</span><p style="font-size:.92rem;color:var(--ink-2);line-height:1.5"><b style="color:var(--ink)">Phone does the matching.</b> Peers send public filters; the phone checks locally. Never asks a server “which addresses are mine.”</p></div>
+        <div class="card">
+          <div class="card-head"><p class="label">What I learned — lives here</p></div>
+          <div class="card-body">
+            <div class="takeaway">
+              <div class="row"><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.2 2.2L9.5 3.6" stroke="#b35f05" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p><b>Smallest policy that fits.</b> A wallet you find annoying is a wallet you empty into a worse one.</p></div>
+              <div class="row"><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.2 2.2L9.5 3.6" stroke="#b35f05" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p><b>Two makers, not two phones.</b> MuSig2 hides the second signer (one 64-byte sig); 2-of-3 advertises it — and that advertisement <em>is</em> the coercion deterrent.</p></div>
+              <div class="row"><span class="tick" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.2 2.2L9.5 3.6" stroke="#b35f05" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><p><b>Phone does the matching.</b> Peers send public filters; the phone checks locally. Never asks a server “which addresses are mine.”</p></div>
+            </div>
           </div>
-          <p style="font-size:.8rem;color:var(--ink-3);margin-top:1rem;border-top:1px solid var(--rule);padding-top:.8rem">The rest — fees, RBF, PSBTv2, import bundles, evidence — is on the pages we’ll open. No duplication here.</p>
+          <div class="card-foot">The rest — fees, RBF, PSBTv2, import bundles, evidence — is on the pages we’ll open. No duplication here.</div>
         </div>
-        <div style="margin-top:1rem;border:1px dashed var(--rule-2);border-radius:1rem;padding:1rem;text-align:center;background:color-mix(in srgb,var(--paper-2) 60%,transparent)">
-          <p style="font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)">Take the map with you</p>
-          <img src="present-qr.png" alt="QR to winnowwallet.com/present" width="160" height="160" style="width:9rem;height:9rem;margin:.7rem auto 0;background:#fff;padding:.4rem;border-radius:.6rem">
-          <p style="font:600 .72rem var(--mono);color:var(--ink-3);margin-top:.5rem">winnowwallet.com/present</p>
+        <div class="qr-card">
+          <p class="label">Take the map with you</p>
+          <img src="present-qr.png" alt="QR to winnowwallet.com/present" width="160" height="160">
+          <p class="url">winnowwallet.com/present</p>
         </div>
       </div>
     </div>
@@ -193,15 +219,15 @@ body.presenting .controls{display:flex}
 
   <!-- Slide 2: focus view for projector -->
   <section class="scene" data-title="What I learned">
-    <div style="max-width:44rem;margin:0 auto;text-align:center">
-      <p class="eyebrow">04 · lives on this page</p>
-      <h1 style="font-size:clamp(2rem,4.5vw,3rem)">What I learned</h1>
-      <div style="text-align:left;margin-top:2rem;display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:1.1rem;overflow:hidden">
-        <div style="background:var(--card);padding:1.3rem 1.2rem"><p style="font-weight:650">Smallest policy that fits the money.</p><p style="color:var(--ink-2);font-size:.92rem;margin-top:.35rem">1 key for spending, 2 when a stolen phone shouldn’t be enough, 3 when losing one shouldn’t lock you out. Annoying wallets get emptied into worse ones.</p></div>
-        <div style="background:var(--card);padding:1.3rem 1.2rem"><p style="font-weight:650">Two makers beats two phones.</p><p style="color:var(--ink-2);font-size:.92rem;margin-top:.35rem">MuSig2 n-of-n hides that a second device exists. 2-of-3 <em>shows</em> it — and that visibility is what makes coercion fail.</p></div>
-        <div style="background:var(--card);padding:1.3rem 1.2rem"><p style="font-weight:650">The phone verifies filters locally.</p><p style="color:var(--ink-2);font-size:.92rem;margin-top:.35rem">No address ever sent to a server. Bounded mempool window while a screen is open; confirmation still comes from a block.</p></div>
+    <div style="max-width:42rem;margin:0 auto">
+      <p class="eyebrow" style="text-align:center">04 · lives on this page</p>
+      <h1 style="font-size:clamp(2rem,4.5vw,2.9rem);text-align:center;text-wrap:balance">What I learned</h1>
+      <div style="margin-top:1.6rem;display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:14px;overflow:hidden">
+        <div style="background:var(--card);padding:1.25rem 1.2rem"><p style="font-weight:650;font-size:.97rem">Smallest policy that fits the money.</p><p style="color:var(--ink-2);font-size:.9rem;margin-top:.35rem;line-height:1.5">1 key for spending, 2 when a stolen phone shouldn’t be enough, 3 when losing one shouldn’t lock you out. Annoying wallets get emptied into worse ones.</p></div>
+        <div style="background:var(--card);padding:1.25rem 1.2rem"><p style="font-weight:650;font-size:.97rem">Two makers beats two phones.</p><p style="color:var(--ink-2);font-size:.9rem;margin-top:.35rem;line-height:1.5">MuSig2 n-of-n hides that a second device exists. 2-of-3 <em>shows</em> it — and that visibility is what makes coercion fail.</p></div>
+        <div style="background:var(--card);padding:1.25rem 1.2rem"><p style="font-weight:650;font-size:.97rem">The phone verifies filters locally.</p><p style="color:var(--ink-2);font-size:.9rem;margin-top:.35rem;line-height:1.5">No address ever sent to a server. Bounded mempool window while a screen is open; confirmation still comes from a block.</p></div>
       </div>
-      <p class="note" style="margin:1.4rem auto 0">Then Q&A — paper, evidence, and source are one tap away.</p>
+      <p class="note" style="margin:1.3rem auto 0;text-align:center">Then Roadmap → Q&A — paper, evidence, and source are one tap away.</p>
     </div>
   </section>
 
