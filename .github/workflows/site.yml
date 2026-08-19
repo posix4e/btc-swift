@@ -43,7 +43,10 @@ jobs:
 
   # ── per-PR preview ───────────────────────────────────────────
   preview:
-    if: github.event_name == 'pull_request'
+    # Fork PRs cannot read CF_API_TOKEN, so skip instead of failing opaquely.
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -84,7 +87,7 @@ jobs:
             const url = process.env.URL || '';
             const apex = (url.match(/^https:\/\/[^.]+\.(.+)$/) || [])[1] || 'winnow-avs.pages.dev';
             const alias = `https://pr-${process.env.PR}.${apex}`;
-            const pages = ['/', '/story', '/architecture', '/present', '/paper', '/evidence']
+            const pages = ['/', '/custody', '/architecture', '/present', '/paper', '/evidence']
               .map(p => `[\`${p}\`](${alias}${p})`).join(' · ');
             const body = [
               marker,
