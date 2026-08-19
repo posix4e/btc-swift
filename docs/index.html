@@ -404,8 +404,7 @@
 
       <article class="beat">
         <div class="beat-media">
-          <details class="flow">
-          <summary>
+          <div class="flow">
             <p class="threshold">Two keys · both must sign</p>
             <svg viewBox="0 0 300 134" role="img" aria-label="A payment is prepared on a desktop wallet, carried to the phone as text, signed there, and the signed text is carried back for the desktop wallet to send.">
               <rect class="frame" x="16" y="14" width="58" height="100" rx="11"/>
@@ -434,15 +433,8 @@
               <span>The signed transaction is text you can copy anywhere.</span>
               <span>It goes back to the desktop wallet, which sends the payment.</span>
             </div>
-            <span class="more"><span class="shut">What is happening here</span><span class="open">Close</span></span>
-          </summary>
-          <div class="detail">
-            <p>The desktop wallet builds the payment and writes it out as a PSBT — a partly signed transaction, which is just text you can copy anywhere. Winnow reads it, shows you the amount, the destination and the fee, and adds its signature.</p>
-            <p>The key itself never moves. Only the signature travels back. The desktop wallet adds the second signature and broadcasts the result.</p>
-            <p>Because the two keys are combined before they ever reach the chain, what gets published is one 64-byte signature — exactly what an ordinary one-key wallet publishes.</p>
-            <p>That matters more than it sounds. Ordinary multisig announces itself: when it is spent, the chain shows the policy it was spending under, so anyone reading it learns you keep a second signer and how many signatures it would take to get past you. Combining the keys publishes none of that. Nobody watching learns there is another device, which means nobody learns there is another device to come looking for.</p>
+            <a class="more" href="/custody">How this works</a>
           </div>
-          </details>
           <div class="device" style="margin-top:1.3rem"><div class="island"></div><div class="screen">
             <img src="screenshots/15-vault-cosign.png" width="1320" height="2868" loading="lazy" alt="Winnow's cosigning screen, showing the payment details the second device is being asked to approve.">
           </div></div>
@@ -452,7 +444,7 @@
           <span class="persona" style="--persona:#2e8b88">Two keys</span>
           <h3>Two devices, and both have to agree.</h3>
           <p>Set up a wallet whose money only moves when two devices sign. Someone who steals one phone, or finds one recovery phrase, still cannot spend a thing.</p>
-          <p>A single hardware wallet is one device you have to be right about. Devices have shipped with keys that were guessable, and everything behind them went at once. Two devices from two makers is two chances to be wrong, and both have to be wrong on the same day for anyone to reach your money.</p>
+          <p>The risk is the maker, not just the thief. Hardware has shipped with keys an attacker could guess; software has shipped with signing bugs. Either takes everything behind it at once, and you cannot audit your way out. Two keys on devices from two different makers means one of them can be wrong and your money survives it.</p>
           <p>And nobody has to know you did it. Combined the aggregated way, two keys produce one signature: 64 bytes, no policy published, nothing on the chain saying a second device exists. Most multisig advertises itself to anyone reading the chain. This does not.</p>
           <div class="fact"><b>Why two beats one:</b> two devices running the same app share whatever that app gets wrong, so the pair is strongest when they come from different makers. Winnow's multisig is a published Bitcoin standard rather than a scheme of its own, which is what lets the second key live somewhere else.</div>
         </div>
@@ -460,8 +452,7 @@
 
       <article class="beat">
         <div class="beat-media">
-          <details class="flow">
-          <summary>
+          <div class="flow">
             <p class="threshold">Three keys · any two sign</p>
             <svg viewBox="0 0 300 134" role="img" aria-label="Three people hold keys. A payment passes to two of them, each signs, and it goes out. The third never takes part.">
               <g>
@@ -492,14 +483,8 @@
               <span>A second holder signs. Two of three is enough.</span>
               <span>The payment goes out. The third never had to be there.</span>
             </div>
-            <span class="more"><span class="shut">What is happening here</span><span class="open">Close</span></span>
-          </summary>
-          <div class="detail">
-            <p>The payment travels as a partly signed transaction and collects signatures as it goes. Every holder sees what they are approving before they approve it — amount, destination, fee — so signing is a review rather than a rubber stamp.</p>
-            <p>Once two of the three have signed, the transaction is finished and anyone can broadcast it. The third holder need never know it happened.</p>
-            <p>Choosing who holds that third key is the real decision. They can never spend alone. Together with either of your keys, they can.</p>
+            <a class="more" href="/custody">How this works</a>
           </div>
-          </details>
           <div class="device" style="margin-top:1.3rem"><div class="island"></div><div class="screen">
             <img src="screenshots/10-vault-create.png" width="1320" height="2868" loading="lazy" alt="Winnow's vault creation screen, choosing how many keys must sign.">
           </div></div>
@@ -508,7 +493,7 @@
         <div class="beat-copy">
           <span class="persona" style="--persona:#62896b">Three keys</span>
           <h3>Two of three, so losing one is survivable.</h3>
-          <p>Hold two keys yourself and place the third with someone else — a family member, or a company whose business is holding one. Any two of the three can move money, so a lost phone is an inconvenience rather than a disaster.</p>
+          <p>Everything that isn't about the maker is solved here. Hold two keys yourself and place a third with someone else — a family member, or a company whose business is holding one. Any two of the three can move money, so a phone in a river is an inconvenience rather than a catastrophe.</p>
           <p>It also changes what you can be made to do. Someone standing over you cannot get the money out of you, because you genuinely cannot send it alone. The third key is elsewhere, and no amount of pressure moves it.</p>
           <p>And it outlives you. If you can no longer sign, the other two can — after whatever real-world checks you set — which is how an estate is settled without handing anyone your keys while you are alive, and how a company holding one key takes part in a loan.</p>
         </div>
@@ -572,6 +557,7 @@
   <div class="wrap foot-in">
     <span>Winnow — a Taproot-first Bitcoin wallet for iPhone. Free and open source.</span>
     <div class="foot-links">
+      <a href="/custody">How you hold it</a>
       <a href="/present">Presentation</a>
       <a href="/architecture">Architecture</a>
       <a href="/paper">Paper</a>
