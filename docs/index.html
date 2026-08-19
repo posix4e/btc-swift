@@ -286,6 +286,35 @@
   .policy-line b{display:block;color:var(--ink);font-size:.96rem}
   .threshold{font:650 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--seed);margin-bottom:.8rem}
 
+  /* ── signing flow ───────────────────────────────────────── */
+  .flow{border:1px solid var(--rule);border-radius:1.2rem;background:var(--card);padding:1.3rem;box-shadow:0 18px 45px rgba(0,0,0,.06)}
+  .flow svg{width:100%;height:auto;display:block;overflow:visible}
+  .flow .frame{fill:none;stroke:var(--rule-2);stroke-width:2}
+  .flow .glass{fill:var(--paper-2)}
+  .flow .ink{fill:var(--ink-3)}
+  .flow .lbl{font:600 7px var(--mono);letter-spacing:.06em;fill:var(--ink-3);text-transform:uppercase}
+  .flow .steps{position:relative;height:3.1em;margin-top:.85rem}
+  .flow .steps span{position:absolute;inset:0;font-size:.86rem;line-height:1.4;color:var(--ink-2);opacity:0;animation:stepIn 12s infinite}
+  .flow .steps span:nth-of-type(2){animation-delay:3s}
+  .flow .steps span:nth-of-type(3){animation-delay:6s}
+  .flow .steps span:nth-of-type(4){animation-delay:9s}
+  @keyframes stepIn{0%,1%{opacity:0}3%,23%{opacity:1}25%,100%{opacity:0}}
+  .flow .packet{animation:packetMove 12s infinite}
+  @keyframes packetMove{0%{opacity:0;transform:translateX(0)}4%{opacity:1}22%,100%{transform:translateX(-150px)}26%,100%{opacity:0}}
+  .flow .hops{animation:packetHops 12s infinite}
+  @keyframes packetHops{0%{opacity:0;transform:translateX(0)}4%,22%{opacity:1;transform:translateX(0)}38%,96%{opacity:1;transform:translateX(106px)}100%{opacity:0;transform:translateX(106px)}}
+  .flow .signed,.flow .sig1{opacity:0;animation:phaseTwo 12s infinite}
+  @keyframes phaseTwo{0%,25%{opacity:0}30%,100%{opacity:1}}
+  .flow .qr,.flow .sig2{opacity:0;animation:phaseThree 12s infinite}
+  @keyframes phaseThree{0%,50%{opacity:0}55%,100%{opacity:1}}
+  .flow .beam{opacity:0;animation:phaseFour 12s infinite}
+  @keyframes phaseFour{0%,75%{opacity:0}80%,96%{opacity:1}100%{opacity:0}}
+  @media (prefers-reduced-motion:reduce){
+    .flow .packet,.flow .hops,.flow .signed,.flow .qr,.flow .beam,.flow .sig1,.flow .sig2,.flow .steps span{animation:none;opacity:1;transform:none}
+    .flow .steps{height:auto}
+    .flow .steps span{position:static;display:block;margin-top:.3rem}
+  }
+
   .cta-panel{background:linear-gradient(135deg,#17130c,#0e0d0a);color:var(--night-ink);border-radius:1.4rem;padding:clamp(2rem,6vw,4rem);text-align:center}
   .cta-panel .sub{color:var(--night-ink-2);margin:1rem auto 0}
   code{font-family:var(--mono);font-size:.88em}
@@ -364,11 +393,34 @@
 
       <article class="beat">
         <div class="beat-media">
-          <div class="policy-card" role="group" aria-label="A two-key wallet: this phone and a separate device, both required to sign">
+          <div class="flow">
             <p class="threshold">Two keys · both must sign</p>
-            <div class="policy-line"><span class="key-dot" style="--key:#f7931a"></span><span><b>This phone</b>Signs in your hand</span></div>
-            <div class="policy-line"><span class="key-dot" style="--key:#315a8a"></span><span><b>A separate device</b>Built by someone else, signs on its own screen</span></div>
-            <div class="policy-line"><span class="key-dot" style="--key:#2e8b88"></span><span><b>The payment</b>Moves only once both have signed</span></div>
+            <svg viewBox="0 0 300 134" role="img" aria-label="A payment is prepared on a desktop wallet, signed on the phone, shown back as a code, and read by the desktop wallet to send.">
+              <rect class="frame" x="16" y="14" width="58" height="100" rx="11"/>
+              <rect class="glass" x="21" y="19" width="48" height="90" rx="7"/>
+              <text class="lbl" x="45" y="128" text-anchor="middle">Phone</text>
+              <g class="signed">
+                <circle cx="45" cy="46" r="11" fill="var(--good)" fill-opacity=".18"/>
+                <path d="M39.5 46l4 4 7-7.5" fill="none" stroke="var(--good)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <g class="qr" fill="var(--ink)">
+                <rect x="29" y="68" width="9" height="9" rx="1.5"/><rect x="40.5" y="68" width="9" height="9" rx="1.5"/><rect x="52" y="68" width="9" height="9" rx="1.5"/>
+                <rect x="29" y="79.5" width="9" height="9" rx="1.5"/><rect x="52" y="79.5" width="9" height="9" rx="1.5"/>
+                <rect x="29" y="91" width="9" height="9" rx="1.5"/><rect x="40.5" y="91" width="9" height="9" rx="1.5"/><rect x="52" y="91" width="9" height="9" rx="1.5"/>
+              </g>
+              <rect class="frame" x="196" y="26" width="92" height="60" rx="6"/>
+              <rect class="glass" x="201" y="31" width="82" height="50" rx="4"/>
+              <rect x="186" y="90" width="112" height="6" rx="3" fill="var(--rule-2)"/>
+              <text class="lbl" x="242" y="128" text-anchor="middle">Desktop wallet</text>
+              <path class="beam" d="M196 62 L78 82 L78 92 L196 76 Z" fill="var(--mark)" fill-opacity=".2"/>
+              <g class="packet"><rect x="176" y="50" width="19" height="14" rx="3.5" fill="var(--mark)"/></g>
+            </svg>
+            <div class="steps">
+              <span>The desktop wallet prepares a payment and hands it over.</span>
+              <span>The phone signs. The key never leaves the device.</span>
+              <span>The phone shows its half of the signature as a code.</span>
+              <span>The desktop wallet reads the code and sends the payment.</span>
+            </div>
           </div>
           <div class="device" style="margin-top:1.3rem"><div class="island"></div><div class="screen">
             <img src="screenshots/15-vault-cosign.png" width="1320" height="2868" loading="lazy" alt="Winnow's cosigning screen, showing the payment details the second device is being asked to approve.">
@@ -386,11 +438,37 @@
 
       <article class="beat">
         <div class="beat-media">
-          <div class="policy-card" role="group" aria-label="A three-key wallet where any two of the three keys can sign">
+          <div class="flow">
             <p class="threshold">Three keys · any two sign</p>
-            <div class="policy-line"><span class="key-dot" style="--key:#f7931a"></span><span><b>Your phone</b>A key you hold</span></div>
-            <div class="policy-line"><span class="key-dot" style="--key:#315a8a"></span><span><b>Your second device</b>Another key you hold</span></div>
-            <div class="policy-line"><span class="key-dot" style="--key:#62896b"></span><span><b>Someone you trust</b>The third key, kept elsewhere</span></div>
+            <svg viewBox="0 0 300 134" role="img" aria-label="Three people hold keys. A payment passes to two of them, each signs, and it goes out. The third never takes part.">
+              <g>
+                <rect class="frame" x="6" y="18" width="76" height="74" rx="10"/>
+                <circle class="ink" cx="44" cy="44" r="9"/>
+                <path class="ink" d="M28 70a16 16 0 0 1 32 0z"/>
+                <text class="lbl" x="44" y="106" text-anchor="middle">You</text>
+                <g class="sig1"><circle cx="70" cy="28" r="9" fill="var(--good)" fill-opacity=".18"/><path d="M65.8 28l3 3 5.4-5.8" fill="none" stroke="var(--good)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></g>
+              </g>
+              <g>
+                <rect class="frame" x="112" y="18" width="76" height="74" rx="10"/>
+                <circle class="ink" cx="150" cy="44" r="9"/>
+                <path class="ink" d="M134 70a16 16 0 0 1 32 0z"/>
+                <text class="lbl" x="150" y="106" text-anchor="middle">Second holder</text>
+                <g class="sig2"><circle cx="176" cy="28" r="9" fill="var(--good)" fill-opacity=".18"/><path d="M171.8 28l3 3 5.4-5.8" fill="none" stroke="var(--good)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></g>
+              </g>
+              <g opacity=".45">
+                <rect class="frame" x="218" y="18" width="76" height="74" rx="10"/>
+                <circle class="ink" cx="256" cy="44" r="9"/>
+                <path class="ink" d="M240 70a16 16 0 0 1 32 0z"/>
+                <text class="lbl" x="256" y="106" text-anchor="middle">Third holder</text>
+              </g>
+              <g class="hops"><rect x="35" y="118" width="19" height="14" rx="3.5" fill="var(--mark)"/></g>
+            </svg>
+            <div class="steps">
+              <span>A payment is drawn up and sent to the first key holder.</span>
+              <span>They sign it and pass it on. Still unspendable.</span>
+              <span>A second holder signs. Two of three is enough.</span>
+              <span>The payment goes out. The third never had to be there.</span>
+            </div>
           </div>
           <div class="device" style="margin-top:1.3rem"><div class="island"></div><div class="screen">
             <img src="screenshots/10-vault-create.png" width="1320" height="2868" loading="lazy" alt="Winnow's vault creation screen, choosing how many keys must sign.">
