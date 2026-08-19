@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Winnow — one wallet, two signers, three roles</title>
-<meta name="description" content="Start with a private Bitcoin hot wallet, add an independent signer, or build an owner–exchange–trust 2-of-3 custody plan.">
+<title>Winnow — a Bitcoin wallet that runs on your phone</title>
+<meta name="description" content="A Bitcoin wallet for iPhone. Your keys are made on the device, and no server is ever asked which addresses are yours.">
 <link rel="canonical" href="https://winnowwallet.com/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f7931a'/%3E%3Cpath d='M7 9h18L18 19v5l-4 2v-7z' fill='%23fff'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://winnowwallet.com/">
-<meta property="og:title" content="Winnow — one wallet, two signers, three roles">
-<meta property="og:description" content="A mobile Bitcoin wallet that grows from everyday liquidity to independent verification and professionally stewarded custody.">
+<meta property="og:title" content="Winnow — a Bitcoin wallet that runs on your phone">
+<meta property="og:description" content="One key for everyday spending, two when a stolen phone shouldn't be enough, three when losing one shouldn't lock you out.">
 <meta property="og:image" content="https://winnowwallet.com/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Winnow — one wallet, two signers, three roles">
-<meta name="twitter:description" content="One wallet for daily money. Two independent signers. Three roles for continuity.">
+<meta name="twitter:title" content="Winnow — a Bitcoin wallet that runs on your phone">
+<meta name="twitter:description" content="Your keys are made on the phone. No server is ever asked which addresses are yours.">
 <meta name="twitter:image" content="https://winnowwallet.com/og.png">
 <style>
   /* ── tokens ─────────────────────────────────────────────── */
@@ -302,7 +302,7 @@
       Winnow
     </span>
     <div class="nav-links">
-      <a href="#custody">Custody</a>
+      <a href="#custody">How you hold it</a>
       <a href="#how" class="hide-xs">How it works</a>
       <a href="/architecture" class="hide-xs">Architecture</a>
       <a href="/paper">Paper</a>
@@ -314,12 +314,12 @@
 <header class="hero">
   <div class="wrap hero-grid">
     <div class="copy">
-      <p class="eyebrow">One wallet · two signers · three roles</p>
+      <p class="eyebrow">Bitcoin on your iPhone · no servers</p>
       <h1>Start with one.<span class="soft">Add protection when it matters.</span></h1>
-      <p class="sub">Use one private hot-wallet key for daily liquidity, add a second independent Bitcoin wallet for compromise resistance, or use owner–lender–trust 2-of-3 custody for continuity. No servers.</p>
+      <p class="sub">A Bitcoin wallet that runs on your phone. Your keys are made on the device, and no server is ever asked which addresses are yours.</p>
       <div class="cta">
         <a class="btn" href="https://testflight.apple.com/join/83djpNE7">Join the public beta</a>
-        <a class="btn ghost" href="#custody">Explore the custody ladder</a>
+        <a class="btn ghost" href="#how">See how it works</a>
       </div>
     </div>
     <div class="shot-col">
@@ -327,10 +327,10 @@
         <div class="island"></div>
         <div class="screen">
           <img src="screenshots/03-receive.png" width="1320" height="2868" fetchpriority="high"
-               alt="Winnow's receive screen: a QR code, a fresh Taproot address beginning tb1p, and a note that incoming payments appear as unconfirmed within seconds while the screen is open.">
+               alt="Winnow's receive screen: a QR code, a fresh address, and a note that incoming payments appear within seconds while the screen is open.">
         </div>
       </div>
-      <p class="note center" style="margin-top:1rem">A fresh Taproot address, derived on the phone.<br>No server was asked to produce it.</p>
+      <p class="note center" style="margin-top:1rem">A fresh address, derived on the phone.<br>No server was asked to produce it.</p>
     </div>
   </div>
 </header>
@@ -339,43 +339,25 @@
 <section id="custody">
   <div class="wrap custody-intro">
     <div>
-      <p class="eyebrow">The 1–2–3 custody ladder</p>
+      <p class="eyebrow">How you hold it</p>
       <h2>Use the smallest policy that fits the money.</h2>
     </div>
-    <p class="fiction">The ladder separates three needs: daily liquidity, protection from one compromised wallet implementation, and continuity when financial or legal institutions must participate.</p>
+    <p class="fiction">One key for everyday spending. Two when a single stolen phone shouldn't be enough. Three when losing one shouldn't lock you out.</p>
   </div>
   <div class="wrap">
-    <div class="custody-rail" role="group" aria-label="Three layers of custody">
-      <div class="custody-level hot">
-        <span class="num">01 · personal · implemented</span>
-        <h3>One hot wallet</h3>
-        <p>Fast enough for customers and suppliers. One lost or compromised key can lose the money.</p>
-      </div>
-      <div class="custody-level cold">
-        <span class="num">02 · independent · coming soon</span>
-        <h3>Two wallets, both sign</h3>
-        <p>External-wallet compatibility is <a href="https://github.com/posix4e/winnow/issues/58">planned—help build it</a>. One compromised implementation cannot spend alone; lose either unbacked-up key and 2-of-2 locks.</p>
-      </div>
-      <div class="custody-level joint">
-        <span class="num">03 · stewarded · coming soon</span>
-        <h3>Owner · lender · trust</h3>
-        <p>Institutional accounts are <a href="https://github.com/posix4e/winnow/issues/53">planned—help build them</a>. Any two can authorize; two institutions can also cooperate.</p>
-      </div>
-    </div>
-
     <div class="custody-list">
       <article class="beat">
         <div class="beat-media">
           <div class="device"><div class="island"></div><div class="screen">
-            <img src="screenshots/03-receive.png" width="1320" height="2868" loading="lazy" alt="Winnow receive screen showing a fresh signet Taproot address and QR code.">
+            <img src="screenshots/03-receive.png" width="1320" height="2868" loading="lazy" alt="Winnow receive screen showing a fresh address and QR code.">
           </div></div>
-          <p class="caption">Public signet demonstration · coins have no value</p>
+          <p class="caption">The receive screen, moments after setup.</p>
         </div>
         <div class="beat-copy">
-          <span class="persona" style="--persona:#e59b3a">Personal · implemented</span>
+          <span class="persona" style="--persona:#e59b3a">Setting up</span>
           <h3>Create the wallet before the chain catches up.</h3>
-          <p>The wallet and its first address are created on the phone immediately. Bitcoin headers load in the background, so writing down or copying the recovery phrase does not wait for the network.</p>
-          <p>A fresh Taproot address can receive immediately. While Receive is open, Winnow watches a bounded slice of peer relay traffic for an early heads-up. The balance becomes final only when the transaction appears in a block.</p>
+          <p>Your wallet and its first address exist the moment you open the app, so writing down your recovery phrase never waits on the network.</p>
+          <p>A fresh address can receive straight away. Payments show up within seconds while the screen is open, and the balance is final once the payment appears in a block.</p>
           <div class="fact"><b>Why it is different:</b> creating keys is local. Knowing what confirmed is a separate network job.</div>
         </div>
       </article>
@@ -383,35 +365,31 @@
       <article class="beat">
         <div class="beat-media">
           <div class="device"><div class="island"></div><div class="screen">
-            <img src="screenshots/15-vault-cosign.png" width="1320" height="2868" loading="lazy" alt="Winnow vault cosigning screen reviewing a partially signed Bitcoin transaction.">
+            <img src="screenshots/15-vault-cosign.png" width="1320" height="2868" loading="lazy" alt="Winnow's cosigning screen, showing the payment details a second device is being asked to approve.">
           </div></div>
-          <p class="caption">Cosigning is transaction review, not blind approval.</p>
+          <p class="caption">The second device approves a payment, not a prompt.</p>
         </div>
         <div class="beat-copy">
-          <span class="persona" style="--persona:#62896b">Recovery path · verified on signet</span>
-          <h3>The contract gives the signatures meaning.</h3>
-          <p>If the owner cannot sign, the exchange and trust can use the same 2-of-3 policy after the required real-world inheritance checks. That continuity is also a control risk: those two institutions are cryptographically able to spend without the owner.</p>
-          <p>The verified recovery path moved funds to its intended output without the owner's signature.</p>
-          <div class="fact"><b>Verified:</b> the exchange + trust path confirmed and credited the intended recovery output.</div>
+          <span class="persona" style="--persona:#2e8b88">Two keys</span>
+          <h3>Two devices, and both have to agree.</h3>
+          <p>Set up a wallet whose money only moves when two devices sign. Someone who steals one phone, or finds one recovery phrase, still cannot spend a thing.</p>
+          <p>A single hardware wallet is one device you have to be right about. If its keys were made badly, everything behind it is exposed at once. Two devices have to fail together.</p>
+          <div class="fact"><b>Worth knowing:</b> two devices running the same app share whatever that app gets wrong. The protection is strongest when the second key lives on something built by other people, and that pairing is not proven yet.</div>
         </div>
       </article>
 
       <article class="beat">
         <div class="beat-media">
-          <div class="policy-card" role="group" aria-label="Two-party MuSig2 reserve">
-            <p class="threshold">Joint reserve · both sign</p>
-            <div class="policy-line"><span class="key-dot" style="--key:#315a8a"></span><span><b>Wallet A</b>Nonce and signature contribution</span></div>
-            <div class="policy-line"><span class="key-dot" style="--key:#2e8b88"></span><span><b>Wallet B</b>Nonce and signature contribution</span></div>
-            <div class="policy-line"><span class="key-dot" style="--key:#f7931a"></span><span><b>On chain</b>One 64-byte key-path signature</span></div>
-          </div>
+          <div class="device"><div class="island"></div><div class="screen">
+            <img src="screenshots/10-vault-create.png" width="1320" height="2868" loading="lazy" alt="Winnow's vault creation screen, choosing how many keys must sign.">
+          </div></div>
+          <p class="caption">Choosing how many keys a payment needs.</p>
         </div>
         <div class="beat-copy">
-          <span class="persona" style="--persona:#2e8b88">Independent wallets · advanced</span>
-          <h3>One compromised key cannot spend alone.</h3>
-          <p>MuSig2 lets two participants combine public keys and signature contributions. Both must participate. The verified signet run proves Winnow's two-party protocol, but it did not prove compatibility with an independent wallet implementation; that work is <a href="https://github.com/posix4e/winnow/issues/58">planned and tracked</a>.</p>
-          <p>Reporting about a <a href="https://www.trmlabs.com/resources/blog/the-largest-hardware-wallet-exploit-of-2026-inside-the-usd-116-million-coldcard-hack">2026 Coldcard weak-entropy incident</a> illustrates the boundary: a mixed-wallet threshold could contain one exposed key because the attacker still lacks another signature. The affected key remains compromised, the second wallet may never display the attempted theft, and shared seeds or common failures erase the benefit.</p>
-          <p>The final spend uses Taproot's key path: no multisig script is revealed, and an observer sees the same witness shape as a single-key Taproot spend.</p>
-          <div class="fact"><b>Verified:</b> the public-signet transaction confirmed with one 64-byte witness item and no revealed script. <b>Planned:</b> mixed-wallet and hardware interoperability.</div>
+          <span class="persona" style="--persona:#62896b">Three keys</span>
+          <h3>Two of three, so losing one is survivable.</h3>
+          <p>Hold two keys yourself and place the third with someone you trust. Any two of the three can move money, so a lost phone is an inconvenience rather than a disaster.</p>
+          <p>No single holder can spend alone — and that includes whoever holds the third key. It also means the other two together can act without you, which is the point when you can't sign, and the risk you are accepting when you choose who holds it.</p>
         </div>
       </article>
 
@@ -420,14 +398,13 @@
           <div class="device"><div class="island"></div><div class="screen">
             <img src="screenshots/14-import-report.png" width="1320" height="2868" loading="lazy" alt="Winnow import report showing a replacement phone's verified wallet data.">
           </div></div>
-          <p class="caption">The replacement phone verifies forward from the exported history.</p>
+          <p class="caption">A new phone, picking up where the old one left off.</p>
         </div>
         <div class="beat-copy">
-          <span class="persona" style="--persona:#e59b3a">Portable recovery · verified on signet</span>
-          <h3>A backup includes more than twelve words.</h3>
-          <p>Winnow scans forward from a wallet's creation height. Its portable export therefore carries public history and scan state alongside the material the user explicitly chooses to include.</p>
-          <p>The signet run imported a redacted-preview seed-bearing bundle into an isolated replacement phone, verified forward, and matched balance, UTXOs, transaction history, replacement links, scan height, and peer connectivity.</p>
-          <div class="fact"><b>Leaving is a feature:</b> the app exports the history it would otherwise have to rediscover through an expensive back-scan.</div>
+          <span class="persona" style="--persona:#e59b3a">Moving phones</span>
+          <h3>A backup is more than twelve words.</h3>
+          <p>Winnow's export carries your history as well as your keys, so a replacement phone opens with your balance and past payments already in place instead of spending a long time rediscovering them.</p>
+          <div class="fact"><b>Leaving is a feature:</b> the export is yours to take, and it is the same file whether you are moving phones or moving on.</div>
         </div>
       </article>
     </div>
@@ -439,7 +416,7 @@
   <div class="wrap center narrow">
     <p class="eyebrow">How it works</p>
     <h2>Every block is summarized. The phone keeps what matters.</h2>
-    <p class="sub" style="margin-top:1.2rem">Winnow verifies the proof-of-work header chain, downloads compact summaries from ordinary Bitcoin peers, and checks them against wallet scripts <em>on the device</em>. A peer serves public chain data instead of answering which addresses belong to the wallet.</p>
+    <p class="sub" style="margin-top:1.2rem">Winnow pulls a short summary of each block from ordinary Bitcoin peers and checks it <em>on your phone</em>. The peer hands over public chain data. It is never told which addresses are yours.</p>
   </div>
   <div class="wrap">
     <canvas id="sieve" aria-hidden="true"></canvas>
@@ -460,13 +437,12 @@
   <div class="wrap">
     <div class="cta-panel">
       <p class="eyebrow">Public beta · open source</p>
-      <h2>Try Winnow. Inspect the choices.</h2>
-      <p class="sub">Winnow defaults to public signet so the architecture can be tested without risking money. The source is open, and the 1–2–3 roadmap is broken into issues contributors can claim and build.</p>
+      <h2>Try Winnow.</h2>
+      <p class="sub">Free, open source, and yours to inspect.</p>
       <div class="cta" style="justify-content:center">
         <a class="btn" href="https://testflight.apple.com/join/83djpNE7">Try Winnow on TestFlight</a>
         <a class="btn ghost" style="color:var(--night-ink);border-color:var(--night-rule)" href="https://github.com/posix4e/winnow">Inspect the source</a>
       </div>
-      <p class="note" style="margin-top:1.5rem"><a href="/present" style="color:var(--mark)">Open the 15-minute presentation</a> · <a href="/architecture" style="color:var(--mark)">Explore the architecture</a> · <a href="/paper" style="color:var(--mark)">Read the canonical paper</a> · <a href="https://github.com/posix4e/winnow/issues/60" style="color:var(--mark)">Follow the roadmap</a></p>
     </div>
   </div>
 </section>
