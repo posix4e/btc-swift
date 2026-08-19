@@ -305,12 +305,12 @@
   @keyframes packetHops{0%{opacity:0;transform:translateX(0)}4%,22%{opacity:1;transform:translateX(0)}38%,96%{opacity:1;transform:translateX(106px)}100%{opacity:0;transform:translateX(106px)}}
   .flow .signed,.flow .sig1{opacity:0;animation:phaseTwo 12s infinite}
   @keyframes phaseTwo{0%,25%{opacity:0}30%,100%{opacity:1}}
-  .flow .qr,.flow .sig2{opacity:0;animation:phaseThree 12s infinite}
+  .flow .blob,.flow .sig2{opacity:0;animation:phaseThree 12s infinite}
   @keyframes phaseThree{0%,50%{opacity:0}55%,100%{opacity:1}}
-  .flow .beam{opacity:0;animation:phaseFour 12s infinite}
-  @keyframes phaseFour{0%,75%{opacity:0}80%,96%{opacity:1}100%{opacity:0}}
+  .flow .back{animation:packetBack 12s infinite}
+  @keyframes packetBack{0%,72%{opacity:0;transform:translateX(0)}77%{opacity:1}94%,100%{transform:translateX(150px)}96%{opacity:1}100%{opacity:0}}
   @media (prefers-reduced-motion:reduce){
-    .flow .packet,.flow .hops,.flow .signed,.flow .qr,.flow .beam,.flow .sig1,.flow .sig2,.flow .steps span{animation:none;opacity:1;transform:none}
+    .flow .packet,.flow .hops,.flow .signed,.flow .blob,.flow .back,.flow .sig1,.flow .sig2,.flow .steps span{animation:none;opacity:1;transform:none}
     .flow .steps{height:auto}
     .flow .steps span{position:static;display:block;margin-top:.3rem}
   }
@@ -395,7 +395,7 @@
         <div class="beat-media">
           <div class="flow">
             <p class="threshold">Two keys · both must sign</p>
-            <svg viewBox="0 0 300 134" role="img" aria-label="A payment is prepared on a desktop wallet, signed on the phone, shown back as a code, and read by the desktop wallet to send.">
+            <svg viewBox="0 0 300 134" role="img" aria-label="A payment is prepared on a desktop wallet, carried to the phone as text, signed there, and the signed text is carried back for the desktop wallet to send.">
               <rect class="frame" x="16" y="14" width="58" height="100" rx="11"/>
               <rect class="glass" x="21" y="19" width="48" height="90" rx="7"/>
               <text class="lbl" x="45" y="128" text-anchor="middle">Phone</text>
@@ -403,23 +403,24 @@
                 <circle cx="45" cy="46" r="11" fill="var(--good)" fill-opacity=".18"/>
                 <path d="M39.5 46l4 4 7-7.5" fill="none" stroke="var(--good)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
               </g>
-              <g class="qr" fill="var(--ink)">
-                <rect x="29" y="68" width="9" height="9" rx="1.5"/><rect x="40.5" y="68" width="9" height="9" rx="1.5"/><rect x="52" y="68" width="9" height="9" rx="1.5"/>
-                <rect x="29" y="79.5" width="9" height="9" rx="1.5"/><rect x="52" y="79.5" width="9" height="9" rx="1.5"/>
-                <rect x="29" y="91" width="9" height="9" rx="1.5"/><rect x="40.5" y="91" width="9" height="9" rx="1.5"/><rect x="52" y="91" width="9" height="9" rx="1.5"/>
+              <g class="blob">
+                <rect x="29" y="70" width="32" height="3.4" rx="1.7" fill="var(--ink)"/>
+                <rect x="29" y="77" width="28" height="3.4" rx="1.7" fill="var(--ink)"/>
+                <rect x="29" y="84" width="32" height="3.4" rx="1.7" fill="var(--ink)"/>
+                <rect x="29" y="91" width="19" height="3.4" rx="1.7" fill="var(--ink)"/>
               </g>
               <rect class="frame" x="196" y="26" width="92" height="60" rx="6"/>
               <rect class="glass" x="201" y="31" width="82" height="50" rx="4"/>
               <rect x="186" y="90" width="112" height="6" rx="3" fill="var(--rule-2)"/>
               <text class="lbl" x="242" y="128" text-anchor="middle">Desktop wallet</text>
-              <path class="beam" d="M196 62 L78 82 L78 92 L196 76 Z" fill="var(--mark)" fill-opacity=".2"/>
+              <g class="back"><rect x="80" y="86" width="19" height="14" rx="3.5" fill="var(--good)"/></g>
               <g class="packet"><rect x="176" y="50" width="19" height="14" rx="3.5" fill="var(--mark)"/></g>
             </svg>
             <div class="steps">
               <span>The desktop wallet prepares a payment and hands it over.</span>
               <span>The phone signs. The key never leaves the device.</span>
-              <span>The phone shows its half of the signature as a code.</span>
-              <span>The desktop wallet reads the code and sends the payment.</span>
+              <span>The signed transaction is text you can copy anywhere.</span>
+              <span>It goes back to the desktop wallet, which sends the payment.</span>
             </div>
           </div>
           <div class="device" style="margin-top:1.3rem"><div class="island"></div><div class="screen">
