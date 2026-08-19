@@ -12,6 +12,8 @@ Everything happens on the phone. The key is generated there, stored there, and n
 
 This is the right shape for money you actually spend. It is the wrong shape for money you cannot afford to lose, for one reason: a single key is a single point of failure. Lose it with no backup and the money is gone. Have it taken and the money is gone.
 
+![A wallet and its first address, seconds after setup. Nothing was asked of a server.](screenshots/03-receive.png)
+
 ---
 
 ## Two keys — resilience against the maker
@@ -28,6 +30,8 @@ Every wallet is somebody's software running on somebody's hardware. Both can be 
 You cannot audit your way out of this. What you can do is refuse to bet everything on one maker being right. Two keys held on devices from two different makers means a flaw in either one is survivable — the attacker who breaks one still needs a signature the broken device cannot produce. Both would have to fail, independently, at the same time.
 
 This is why "two devices" is not the same as "two of my phones". Two devices running the same software share the same mistakes. The independence is the product.
+
+![The second device approving a payment. It sees the amount, the destination and the fee before it signs anything.](screenshots/15-vault-cosign.png)
 
 ### And nobody has to know you have it
 
@@ -46,6 +50,8 @@ The trade: combined keys are all-or-nothing. Two of two, three of three. If you 
 ## Three or more — everything else
 
 Any two of three. Any three of five. You choose how many keys exist and how many must agree.
+
+![Choosing how many keys exist and how many of them a payment needs.](screenshots/10-vault-create.png)
 
 This is the shape for every problem that is not about the maker:
 
@@ -70,5 +76,7 @@ So the two shapes protect against opposite things, and it is worth being deliber
 Nothing secret. A payment starts as a partly signed transaction — a file of text — and gathers signatures as it goes.
 
 Each holder sees what they are approving before approving it: the amount, the destination, the fee. Signing is a review, not a rubber stamp. The keys never move; only signatures do. When enough signatures exist, anyone can broadcast it, and the payment is ordinary from that moment on.
+
+![A payment under review before any signature is added.](screenshots/06-send-review.png)
 
 The technical write-up of both policies, including the exact descriptors and witness shapes, is in the [design paper](/paper).
