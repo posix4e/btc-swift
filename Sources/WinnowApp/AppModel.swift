@@ -239,7 +239,7 @@ final class AppModel {
             walletDescriptor = await wallet.descriptor
             // A wallet whose backup was never confirmed re-enters onboarding:
             // the backup sheet resumes from the Keychain (#5).
-            let backupPending = pendingBackupMnemonic() != nil
+            let backupPending = hasPendingBackup
             stage = backupPending ? .onboarding : .ready
             if backupPending {
                 e2e?.journal("backup.pendingResumed", fields: ["walletID": walletID ?? ""])
@@ -565,6 +565,7 @@ final class AppModel {
     /// Peer/header catch-up continues through the regular sync loop while the
     /// user backs up the phrase.
     func createWallet() async throws -> String {
+        try await authenticateSensitiveAction(reason: "Create and reveal a new wallet recovery phrase")
         await buildStackIfNeeded()
         guard let stack else { throw AppError.noStack }
         let knownHeight = await creationHeightForNewWallet()
@@ -600,6 +601,10 @@ final class AppModel {
         }
         let bundle = try JSONDecoder().decode(ImportBundle.self, from: data)
         guard bundle.network == network.rawValue else { throw AppError.wrongNetwork(bundle.network) }
+        if bundle.mnemonic != nil {
+            try await authenticateSensitiveAction(
+                reason: "Import this wallet's recovery phrase")
+        }
         e2e?.journal("import.started", fields: [
             "bundleVersion": String(bundle.version),
             "seedBearing": String(bundle.mnemonic != nil),
@@ -732,11 +737,18 @@ final class AppModel {
     /// only between `createWallet()` and the backup sheet's Done. Read from
     /// the Keychain on demand so a relaunch mid-backup resumes the sheet with
     /// the same words.
-    func pendingBackupMnemonic() -> String? {
-        guard let walletID,
-              defaults.bool(forKey: DefaultsKey.backupPending(walletID)),
-              case let .mnemonic(words) = try? keyStore.load(walletID: walletID)
-        else { return nil }
+    private var hasPendingBackup: Bool {
+        guard let walletID else { return false }
+        return defaults.bool(forKey: DefaultsKey.backupPending(walletID))
+    }
+
+    func pendingBackupMnemonic() async throws -> String? {
+        guard let walletID, hasPendingBackup else { return nil }
+        try await authenticateSensitiveAction(
+            reason: "Resume this wallet's recovery-phrase backup")
+        guard case let .mnemonic(words) = try keyStore.load(walletID: walletID) else {
+            throw AppError.mnemonicUnavailable
+        }
         return words
     }
 
@@ -1132,7 +1144,7 @@ final class AppModel {
             walletDescriptor = await wallet.descriptor
             // A wallet whose backup was never confirmed re-enters onboarding:
             // the backup sheet resumes from the Keychain (#5).
-            stage = pendingBackupMnemonic() == nil ? .ready : .onboarding
+            stage = hasPendingBackup ? .onboarding : .ready
         } else {
             stage = .onboarding
         }
