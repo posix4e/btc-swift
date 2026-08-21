@@ -7,6 +7,24 @@ import SwiftUI
 import UIKit
 import WalletCore
 
+@MainActor
+protocol DeviceAuthenticating {
+    func authenticate(reason: String) async throws
+}
+
+struct LocalDeviceAuthenticator: DeviceAuthenticating {
+    func authenticate(reason: String) async throws {
+        let context = LAContext()
+        var unavailable: NSError?
+        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &unavailable) else {
+            throw AppModel.AppError.deviceAuthUnavailable
+        }
+        let passed = try await context.evaluatePolicy(
+            .deviceOwnerAuthentication, localizedReason: reason)
+        guard passed else { throw AppModel.AppError.deviceAuthFailed }
+    }
+}
+
 /// The one app model: owns the wallet, the P2P sync stack and the vault
 /// store, and drives sync-while-active (docs/read-side.md: the read path is
 /// BIP157/158 compact filters over P2P; nothing runs in the background, so
@@ -40,7 +58,7 @@ final class AppModel {
             case let .invalidPeer(text): "Invalid peer “\(text)” — use host:port."
             case let .wrongNetwork(network): "This bundle is for \(network); switch the network in Settings first."
             case .duplicateVault: "A vault with this descriptor already exists."
-            case .deviceAuthUnavailable: "Set a device passcode first — the recovery phrase only shows after device authentication."
+            case .deviceAuthUnavailable: "Set a device passcode first — sensitive wallet actions require device authentication."
             case .deviceAuthFailed: "Device authentication failed."
             }
         }
@@ -140,6 +158,7 @@ final class AppModel {
     let keyStore: any KeyStore
     let vaultStore = VaultStore()
     private let defaults: UserDefaults
+    private let deviceAuthenticator: any DeviceAuthenticating
 
     /// Non-nil only when launched with WINNOW_E2E=1 (XCUITest runs).
     let e2e: E2EMode?
@@ -176,7 +195,8 @@ final class AppModel {
         static func backupPending(_ walletID: String) -> String { "backupPending.\(walletID)" }
     }
 
-    init() {
+    init(deviceAuthenticator: any DeviceAuthenticating = LocalDeviceAuthenticator()) {
+        self.deviceAuthenticator = deviceAuthenticator
         let e2e = E2EMode.current
         self.e2e = e2e
         e2e?.wipeIfRequested()
@@ -629,6 +649,10 @@ final class AppModel {
     /// throws ``WalletError/mnemonicUnavailable`` rather than a fake seed.
     func exportWalletBundle(includeMnemonic: Bool) async throws -> String {
         guard let wallet else { throw AppError.noWallet }
+        if includeMnemonic {
+            try await authenticateSensitiveAction(
+                reason: "Export this wallet with its recovery phrase")
+        }
         // The UI snapshot already prefers filters.nextScanHeight; export
         // must too, in case the last persist was skipped (failed pass).
         if let filters = stack?.filters {
@@ -723,17 +747,7 @@ final class AppModel {
     /// throws `WalletError.mnemonicUnavailable`.
     func revealMnemonic() async throws -> String {
         guard let walletID else { throw AppError.noWallet }
-        if e2e == nil || e2e?.requireDeviceAuthentication == true {
-            let context = LAContext()
-            var unavailable: NSError?
-            guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &unavailable) else {
-                throw AppError.deviceAuthUnavailable
-            }
-            let passed = try await context.evaluatePolicy(
-                .deviceOwnerAuthentication,
-                localizedReason: "Reveal this wallet's recovery phrase")
-            guard passed else { throw AppError.deviceAuthFailed }
-        }
+        try await authenticateSensitiveAction(reason: "Reveal this wallet's recovery phrase")
         guard case let .mnemonic(words) = try keyStore.load(walletID: walletID) else {
             throw WalletError.mnemonicUnavailable
         }
@@ -758,17 +772,7 @@ final class AppModel {
     /// wallet, so a re-import does not pay for a fresh header sync.
     func destroyWallet() async throws {
         guard let walletID else { throw AppError.noWallet }
-        if e2e == nil || e2e?.requireDeviceAuthentication == true {
-            let context = LAContext()
-            var unavailable: NSError?
-            guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &unavailable) else {
-                throw AppError.deviceAuthUnavailable
-            }
-            let passed = try await context.evaluatePolicy(
-                .deviceOwnerAuthentication,
-                localizedReason: "Delete this wallet from this device")
-            guard passed else { throw AppError.deviceAuthFailed }
-        }
+        try await authenticateSensitiveAction(reason: "Delete this wallet from this device")
 
         syncTask?.cancel()
         syncTask = nil
@@ -899,6 +903,7 @@ final class AppModel {
     /// (internal byte order).
     func send(preview: SendPreview) async throws -> Data {
         guard let wallet else { throw AppError.noWallet }
+        try await authenticateSensitiveAction(reason: "Sign and send this Bitcoin transaction")
         // Build and sign WITHOUT touching wallet state, hand the tx to the
         // broadcaster, and only then commit the selection. If broadcast throws
         // (no stack, disk error), nothing was spent locally — no stranded UTXOs.
@@ -936,6 +941,7 @@ final class AppModel {
     func bumpFee(txid: Data, feeRateSatPerVByte: Double) async throws -> Data {
         guard let wallet else { throw AppError.noWallet }
         guard let broadcaster = stack?.broadcaster else { throw AppError.noStack }
+        try await authenticateSensitiveAction(reason: "Sign a replacement Bitcoin transaction")
         let prepared = try await wallet.buildFeeBump(txid: txid,
                                                      feeRateSatPerVByte: feeRateSatPerVByte)
         let replacementVSize = TransactionBuilder.vsize(of: prepared.built.transaction)
@@ -1084,14 +1090,23 @@ final class AppModel {
     }
 
     /// Loads the wallet's master key for one vault signing operation.
-    func withMasterKey<T>(_ body: (HDKey) throws -> T) throws -> T {
+    func withMasterKey<T>(reason: String, _ body: (HDKey) throws -> T) async throws -> T {
         guard let walletID else { throw AppError.noWallet }
+        try await authenticateSensitiveAction(reason: reason)
         let master: HDKey
         switch try keyStore.load(walletID: walletID) {
         case let .mnemonic(words): master = try HDKey(seed: BIP39.seed(mnemonic: words))
         case let .masterKey(xprv): master = try HDKey.deserialize(xprv)
         }
         return try body(master)
+    }
+
+    /// One fail-closed authorization boundary for every secret-revealing or
+    /// signing operation. Automated Debug runs may bypass it explicitly;
+    /// PR #106 removes that bypass and its environment parser from Release.
+    func authenticateSensitiveAction(reason: String) async throws {
+        if e2e != nil, e2e?.requireDeviceAuthentication != true { return }
+        try await deviceAuthenticator.authenticate(reason: reason)
     }
 
     // MARK: - Settings
