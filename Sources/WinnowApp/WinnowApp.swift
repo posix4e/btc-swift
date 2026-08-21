@@ -1,3 +1,4 @@
+import BitcoinP2P
 import SwiftUI
 
 @main
@@ -15,12 +16,42 @@ struct WinnowApp: App {
                     OnboardingView()
                 case .ready:
                     MainTabView()
+                case let .storageDamaged(message):
+                    StorageDamagedView(message: message)
                 }
             }
             .environment(model)
             .task { await model.boot() }
             .onChange(of: scenePhase) { _, phase in model.scenePhaseChanged(phase) }
         }
+    }
+}
+
+struct StorageDamagedView: View {
+    let message: String
+    @Environment(AppModel.self) private var model
+
+    private var otherNetwork: BitcoinNetwork {
+        model.network == .mainnet ? .signet : .mainnet
+    }
+
+    var body: some View {
+        ContentUnavailableView {
+            Label("Wallet data needs attention", systemImage: "externaldrive.badge.exclamationmark")
+        } description: {
+            Text(message)
+        } actions: {
+            Button("Retry without changing anything") {
+                Task { await model.retryWalletOpen() }
+            }
+            .buttonStyle(.borderedProminent)
+            .accessibilityIdentifier("retryDamagedWalletButton")
+            Button("Open the \(otherNetwork.rawValue) wallet instead") {
+                Task { await model.switchNetwork(to: otherNetwork) }
+            }
+            .accessibilityIdentifier("switchFromDamagedWalletButton")
+        }
+        .padding()
     }
 }
 
