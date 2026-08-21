@@ -7,20 +7,60 @@ struct WinnowApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                switch model.stage {
-                case .loading:
-                    ProgressView("Opening wallet…")
-                case .onboarding:
-                    OnboardingView()
-                case .ready:
-                    MainTabView()
+            ZStack {
+                Group {
+                    switch model.stage {
+                    case .loading:
+                        ProgressView("Opening wallet…")
+                    case .onboarding:
+                        OnboardingView()
+                    case .ready:
+                        MainTabView()
+                    }
+                }
+                .accessibilityHidden(shouldObscureWallet(for: scenePhase))
+
+                // iOS captures an app-switcher snapshot as a scene becomes
+                // inactive. Cover the entire wallet synchronously so a visible
+                // recovery phrase, PSBT, address, or balance is not preserved
+                // in that snapshot. The cover remains until the scene is active.
+                if shouldObscureWallet(for: scenePhase) {
+                    AppPrivacyCover()
+                        .zIndex(1)
                 }
             }
             .environment(model)
             .task { await model.boot() }
             .onChange(of: scenePhase) { _, phase in model.scenePhaseChanged(phase) }
         }
+    }
+}
+
+/// A tiny pure policy so active/inactive/background behavior is deterministic
+/// and covered without trying to introspect an iOS app-switcher snapshot.
+func shouldObscureWallet(for phase: ScenePhase) -> Bool {
+    switch phase {
+    case .active: false
+    case .inactive, .background: true
+    @unknown default: true
+    }
+}
+
+private struct AppPrivacyCover: View {
+    var body: some View {
+        ZStack {
+            Color(.systemBackground)
+                .ignoresSafeArea()
+            VStack(spacing: 12) {
+                Image(systemName: "lock.shield")
+                    .font(.system(size: 34, weight: .semibold))
+                Text("Winnow is locked")
+                    .font(.headline)
+            }
+            .foregroundStyle(.secondary)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Winnow is hidden while inactive")
     }
 }
 

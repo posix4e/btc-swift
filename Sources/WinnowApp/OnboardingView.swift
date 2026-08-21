@@ -127,6 +127,7 @@ private struct MnemonicBackupView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
+                    .privacySensitive()
                 }
                 Section {
                     RecoveryPhraseCopyButton(
