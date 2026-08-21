@@ -28,6 +28,7 @@ final class AppModel {
         case invalidPeer(String)
         case wrongNetwork(String)
         case duplicateVault
+        case sendReviewChanged
         case deviceAuthUnavailable
         case deviceAuthFailed
 
@@ -40,6 +41,7 @@ final class AppModel {
             case let .invalidPeer(text): "Invalid peer “\(text)” — use host:port."
             case let .wrongNetwork(network): "This bundle is for \(network); switch the network in Settings first."
             case .duplicateVault: "A vault with this descriptor already exists."
+            case .sendReviewChanged: "The available coins, fee, or change changed. Review the payment again before signing."
             case .deviceAuthUnavailable: "Set a device passcode first — the recovery phrase only shows after device authentication."
             case .deviceAuthFailed: "Device authentication failed."
             }
@@ -859,12 +861,41 @@ final class AppModel {
     /// What a send will look like at the resolved feerate (coin selection run
     /// without committing — `Wallet.send` itself commits on success).
     struct SendPreview: Equatable {
+        struct ReviewedOutpoint: Equatable {
+            var txid: Data
+            var vout: UInt32
+        }
+
+        /// The normalized address/code that produced the actual payment.
+        /// Review UI renders this immutable value, never live text-field state.
+        var destination: String
         var payments: [Payment]
         var silentPayments: [SilentPayment]
         var feeRateSatPerVByte: Double
         var fee: Int64
         var changeAmount: Int64?
         var inputCount: Int
+        /// Authorization-relevant state that is not useful to render in the
+        /// simple UI but must remain identical when the wallet signs.
+        var selectedOutpoints: [ReviewedOutpoint]
+        var change: Payment?
+
+        func authorizes(_ built: BuiltTransaction) -> Bool {
+            guard built.fee == fee,
+                  built.changeAmount == changeAmount,
+                  built.transaction.inputs.map({
+                      ReviewedOutpoint(txid: $0.previousOutput.txid, vout: $0.previousOutput.vout)
+                  }) == selectedOutpoints
+            else { return false }
+            switch change {
+            case nil:
+                return changeAmount == nil
+            case let expected?:
+                return built.transaction.outputs.contains {
+                    $0.value == expected.amount && $0.scriptPubKey == expected.scriptPubKey
+                }
+            }
+        }
     }
 
     /// Parses the destination (any standard address, or an sp1…/tsp1… silent
@@ -890,9 +921,13 @@ final class AppModel {
         let selection = try CoinSelection.select(utxos: utxos, payments: sizingPayments,
                                                  changeScriptPubKey: changeScript,
                                                  feeRateSatPerVByte: feeRate)
-        return SendPreview(payments: payments, silentPayments: silentPayments,
+        let change = selection.changeAmount.map { Payment(amount: $0, scriptPubKey: changeScript) }
+        return SendPreview(destination: trimmed, payments: payments, silentPayments: silentPayments,
                            feeRateSatPerVByte: feeRate, fee: selection.fee,
-                           changeAmount: selection.changeAmount, inputCount: selection.selected.count)
+                           changeAmount: selection.changeAmount, inputCount: selection.selected.count,
+                           selectedOutpoints: selection.selected.map {
+                               .init(txid: $0.txid, vout: $0.vout)
+                           }, change: change)
     }
 
     /// Builds, signs and broadcasts the previewed send. Returns the txid
@@ -905,6 +940,7 @@ final class AppModel {
         let prepared = try await wallet.buildSend(payments: preview.payments,
                                                   feeRateSatPerVByte: preview.feeRateSatPerVByte,
                                                   silentPayments: preview.silentPayments)
+        guard preview.authorizes(prepared.built) else { throw AppError.sendReviewChanged }
         let txid = try await broadcast(prepared.built.transaction,
                                        feeRateSatPerVByte: preview.feeRateSatPerVByte)
         try await wallet.commit(prepared)
@@ -933,11 +969,12 @@ final class AppModel {
     /// and cancels the original relay only after both succeed. If commit fails,
     /// the new broadcaster entry is removed and the old transaction keeps
     /// relaying, preserving the same rollback boundary as a first send.
-    func bumpFee(txid: Data, feeRateSatPerVByte: Double) async throws -> Data {
+    func bumpFee(preview: FeeBumpPreview) async throws -> Data {
         guard let wallet else { throw AppError.noWallet }
         guard let broadcaster = stack?.broadcaster else { throw AppError.noStack }
-        let prepared = try await wallet.buildFeeBump(txid: txid,
-                                                     feeRateSatPerVByte: feeRateSatPerVByte)
+        let prepared = try await wallet.buildFeeBump(
+            txid: preview.originalTxid, feeRateSatPerVByte: preview.feeRateSatPerVByte)
+        guard preview.authorizes(prepared.built) else { throw AppError.sendReviewChanged }
         let replacementVSize = TransactionBuilder.vsize(of: prepared.built.transaction)
         let replacementRate = Double(prepared.built.fee) / Double(replacementVSize)
         let replacementTxid = try await broadcast(
@@ -948,10 +985,10 @@ final class AppModel {
             await broadcaster.cancel(replacementTxid)
             throw error
         }
-        await broadcaster.cancel(txid)
+        await broadcaster.cancel(preview.originalTxid)
         await refresh()
         e2e?.journal("transaction.replaced", fields: [
-            "original": txid.displayHex,
+            "original": preview.originalTxid.displayHex,
             "replacement": replacementTxid.displayHex,
             "raw": prepared.built.transaction.serialized(includeWitness: true).hex,
         ])
