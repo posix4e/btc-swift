@@ -54,9 +54,27 @@ struct E2EMode {
 
     static let keychainServicePrefix = "org.btc-swift.wallet.e2e"
 
-    static var current: E2EMode? {
-        let environment = ProcessInfo.processInfo.environment
-        guard environment["WINNOW_E2E"] == "1" else { return nil }
+    /// What an environment says about E2E mode.
+    ///
+    /// `missingPinnedEntropy` exists because the alternative is silent and
+    /// irreversible. A capture run screenshots the recovery-phrase screen and
+    /// those images are committed to a public repository and published to the
+    /// site. With no pinned entropy the app falls through to ordinary
+    /// onboarding and generates a *real* seed, so a run that merely forgot the
+    /// variable would publish live key material. Every launcher — both
+    /// XCUITest call sites and the story runner — passes it today, so this can
+    /// only be reached by a mistake, which is exactly when failing loudly is
+    /// worth more than carrying on.
+    enum Resolution {
+        case inactive
+        case active(E2EMode)
+        case missingPinnedEntropy
+    }
+
+    /// Pure resolution, so the fail-closed rule is testable without a process
+    /// environment.
+    static func resolve(environment: [String: String]) -> Resolution {
+        guard environment["WINNOW_E2E"] == "1" else { return .inactive }
         let entropy: Data?
         if let hex = environment["WINNOW_E2E_ENTROPY"] {
             entropy = Data(hex: hex)
@@ -65,7 +83,11 @@ struct E2EMode {
         } else {
             entropy = nil
         }
-        return E2EMode(runID: environment["WINNOW_E2E_RUN"] ?? "main",
+        // Unparseable entropy or an invalid mnemonic land here too: a value
+        // that was meant to be pinned but could not be read is a mistake of
+        // the same kind, not a licence to generate one.
+        guard let entropy else { return .missingPinnedEntropy }
+        return .active(E2EMode(runID: environment["WINNOW_E2E_RUN"] ?? "main",
                        peer: environment["WINNOW_E2E_PEER"],
                        challenge: environment["WINNOW_E2E_CHALLENGE"].flatMap { Data(hex: $0) },
                        entropy: entropy,
@@ -75,7 +97,20 @@ struct E2EMode {
                        forcedNetwork: environment["WINNOW_E2E_NETWORK"]
                            .flatMap(BitcoinNetwork.init(rawValue:)),
                        initialTab: environment["WINNOW_E2E_TAB"],
-                       requireDeviceAuthentication: environment["WINNOW_E2E_DEVICE_AUTH"] == "1")
+                       requireDeviceAuthentication: environment["WINNOW_E2E_DEVICE_AUTH"] == "1"))
+    }
+
+    static var current: E2EMode? {
+        switch resolve(environment: ProcessInfo.processInfo.environment) {
+        case .inactive:
+            return nil
+        case let .active(mode):
+            return mode
+        case .missingPinnedEntropy:
+            preconditionFailure(
+                "WINNOW_E2E=1 without a readable WINNOW_E2E_ENTROPY or WINNOW_E2E_MNEMONIC. "
+                    + "A capture run must never generate a real seed: its screenshots are published.")
+        }
     }
 
     /// The Application Support subdirectory used instead of "BTCSwift".
@@ -123,12 +158,8 @@ struct E2EMode {
             // Fail closed: an unsafe schema mistake produces no event at all.
             return
         }
-        let containsMnemonic = fields.values.contains { value in
-            let wordCount = value.split(whereSeparator: \.isWhitespace).count
-            guard [12, 15, 18, 21, 24].contains(wordCount) else { return false }
-            return (try? BIP39.validate(mnemonic: value)) != nil
-        }
-        guard !containsMnemonic else { return }
+        guard !fields.values.contains(where: Self.looksSecret) else { return }
+        guard !fields.values.contains(where: carriesThisRunsSeed) else { return }
         guard let base = try? FileManager.default.url(for: .applicationSupportDirectory,
                                                        in: .userDomainMask,
                                                        appropriateFor: nil, create: true) else { return }
@@ -151,6 +182,46 @@ struct E2EMode {
         }
         try? FileManager.default.setAttributes([.posixPermissions: 0o600],
                                                ofItemAtPath: url.path)
+    }
+
+    /// Value-level checks, because a field name only catches the mistakes
+    /// someone labelled honestly. The comment above promises the journal holds
+    /// no mnemonics, private keys, entropy or secret nonces; the name denylist
+    /// alone enforces none of that once a secret is filed under "note".
+    ///
+    /// These deliberately do not ban long hex runs: the journal legitimately
+    /// carries txids and raw transactions, so a blanket rule would either fire
+    /// constantly or be switched off.
+    static func looksSecret(_ value: String) -> Bool {
+        let wordCount = value.split(whereSeparator: \.isWhitespace).count
+        if [12, 15, 18, 21, 24].contains(wordCount), (try? BIP39.validate(mnemonic: value)) != nil {
+            return true
+        }
+        // Extended private keys are unambiguous by prefix, whatever the field
+        // is called.
+        for prefix in ["xprv", "tprv", "yprv", "zprv", "vprv", "uprv"]
+            where value.lowercased().contains(prefix)
+        {
+            return true
+        }
+        return false
+    }
+
+    /// The strongest check available here, and the one with no false
+    /// positives: this run holds its own seed, so the journal can be compared
+    /// against the actual secret rather than against a guess at what secrets
+    /// look like.
+    func carriesThisRunsSeed(_ value: String) -> Bool {
+        guard let entropy, !entropy.isEmpty else { return false }
+        let hex = entropy.map { String(format: "%02x", $0) }.joined()
+        let haystack = value.lowercased()
+        if haystack.contains(hex) { return true }
+        if let mnemonic = try? BIP39.mnemonic(entropy: entropy),
+           haystack.contains(mnemonic.lowercased())
+        {
+            return true
+        }
+        return false
     }
 
     /// Mnemonic sentence → entropy (BIP39 decode; the injected mnemonic is
